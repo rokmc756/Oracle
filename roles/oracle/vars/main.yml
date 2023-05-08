@@ -1,0 +1,78 @@
+---
+# vars file for oracle19c_install
+#
+# oracle_version: 19c
+oracle_major_version: "21"
+oracle_patch_version: "c"
+oracle_version: "{{ oracle_major_version }}{{ oracle_patch_version }}"
+
+oracle_install_group:
+  - {
+    "group": "oinstall",
+    "gid": "1501"
+  }
+  - {
+    "group": "dba",
+    "gid": "1502"
+  }
+  - {
+    "group": "oper",
+    "gid": "1503"
+  }
+  - {
+    "group": "backupdba",
+    "gid": "1504"
+  }
+  - {
+    "group": "dgdba",
+    "gid": "1505"
+  }
+  - {
+    "group": "kmdba",
+    "gid": "1506"
+  }
+  - {
+    "group": "racdba",
+    "gid": "1507"
+  }
+
+oracle_ports:
+  - {
+    "proto": "tcp",
+    "port": "1521"
+  }
+  - {
+    "proto": "tcp",
+    "port": "5500"
+  }
+  - {
+    "proto": "tcp",
+    "port": "5520"
+  }
+  - {
+    "proto": "tcp",
+    "port": "3938"
+  }
+
+mount_directory:    "/"
+root_directory:     "/u01"
+app_dir:            "/u01/app"
+stage_dir:          "/u01/stage"
+
+sub_root_directory: "/u02"
+sub_oradata:        "/u02/oradata"
+
+scripts_directory:  "{{ root_directory }}/app/scripts"
+oracle_base:        "/u01/app/oracle"
+oracle_home:        "/u01/app/oracle/product/{{ oracle_version }}/dbhome_1"
+oracle_inventory:   "/u01/app/oraInventory"
+oracle_user:        "oracle"
+oracle_password:    "changeme"
+root_user:          "root"
+oradbsoft_rsp:      "Oracle_EE_SoftOnly"
+oracle_binary:      "LINUX.X64_213000_db_home.zip"
+# LINUX.X64_193000_db_home.zip
+
+oracle_dep_rpms: "bc,binutils,compat-openssl10,elfutils-libelf,glibc,glibc-devel,ksh,libaio,libXrender,libX11,libXau,libXi,
+libXtst,libgcc,libnsl,libstdc++,libxcb,libibverbs,make,policycoreutils,policycoreutils-python-utils,smartmontools,sysstat,
+libnsl2,libnsl2-devel,net-tools,nfs-utils,unzip,java-1.8.0-openjdk"

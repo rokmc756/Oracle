@@ -1,0 +1,17 @@
+---
+# handlers file for oracle install
+- name: Restart system
+  remote_user: root
+  shell: ( /bin/sleep 5 ; /sbin/shutdown -r now "Ansible updates triggered" ) &
+  async: 30
+  poll: 0
+  ignore_errors: true
+
+- name: Waiting for server to come back after reboot
+  remote_user: root
+  local_action: wait_for host={{ inventory_hostname }} port=22 state=started delay=20 timeout=90
+  become: no
+
+- name: Reload sysctl
+  remote_user: root
+  shell: /sbin/sysctl -p /etc/sysctl.conf

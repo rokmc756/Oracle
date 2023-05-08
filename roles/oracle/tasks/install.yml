@@ -1,0 +1,198 @@
+---
+# tasks file for oracle19c_install
+
+- name: Display pre database software install message
+  remote_user: "{{ root_user }}"
+  debug:
+    msg:
+      - 'Oracle Database Software 19c Installation started for Single Instance at {{ansible_date_time.iso8601}}:'
+
+#
+- name: Put SELinux in permissive mode, logging actions that would be blocked.
+  selinux:
+    policy: targeted
+    state: permissive
+
+#
+- name: Create the limit.conf and sysctl.conf for Oracle Database
+  become: true
+  template: src="{{ item.fn }}.j2" dest="{{ item.copy_dir }}/{{ item.fn }}" owner=root group=root mode=644 force=yes
+  register: oracle_config_created
+  with_items:
+    - { fn: "30-oracle-limits.conf", copy_dir: "/etc/security/limits.d" }
+    - { fn: "98-oracle-sysctl.conf", copy_dir: "/etc/sysctl.d" }
+  notify:
+    - Reload sysctl
+
+#  notify:
+#    - restart system
+#    - waiting for server to come back after reboot
+
+- name: Open ports for Oracle Database
+  firewalld:
+    zone: public
+    port: "{{ item.port }}/{{ item.proto }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop: "{{ oracle_ports }}"
+
+- name: Tune kernel parameters for Oracle database
+  replace:
+    path: /etc/default/grub
+    regexp: '^(GRUB_CMDLINE_LINUX=(?:(?![" ]{{ item.option | regex_escape }}=).)*"?)\s*(?:{{ item.option | regex_escape }}=\S+\s*)?(.*")$'
+    replace: '\1 {{ item.option }}={{ item.value }}\2'
+  with_items:
+    - { option: "numa", value: "off" }
+    - { option: "transparent_hugepage", value: "never" }
+    - { option: "clocksource", value: "tsc" }
+
+#    - { option: "net.ifnames", value: "0" }
+#    - { option: "biosdevname", value: "0" }
+
+#  notify:
+#    - Restart system
+#    - Waiting for server to come back after reboot
+
+- name: Update grub2 config
+  shell: ( grub2-mkconfig -o /boot/grub2/grub.cfg )
+  notify:
+    - Restart system
+    - Waiting for server to come back after reboot
+
+- meta: flush_handlers
+
+
+#- name: Enable development package repository for Oracle Database
+#  become: yes
+#  yum_repository:
+#    name: devel
+#    description: Rocky Linux $releasever - Devel WARNING! FOR BUILDROOT AND KOJI USE
+#    mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=Devel-$releasever
+#    enabled: yes
+
+- name: Install dependent rpm packages to need installing Oracle Database
+  yum:
+    name: "{{ oracle_dep_rpms }}"
+    state: present
+    enablerepo: devel
+
+
+- name: Creating installation directories
+  file:
+    path="{{ item }}"
+    state=directory
+    mode=0755
+  with_items:
+    - "{{ oracle_inventory }}"
+    - "{{ oracle_base }}"
+    - "{{ stage_dir }}"
+    - "{{ oracle_home }}"
+    - "{{ sub_root_directory }}"
+    - "{{ sub_oradata }}"
+  when: inventory_hostname in groups['databases']
+
+- name: Create groups for Oracle Installation
+  group:
+    name: "{{ item.group }}"
+    state: present
+    gid: "{{ item.gid }}"
+  loop: "{{ oracle_install_group }}"
+  when: inventory_hostname in groups['databases']
+
+- name: Set fact for oracle group list except oinstall group
+  set_fact:
+    oracle_group_list: "{{ oracle_install_group | selectattr('group', 'defined') | map(attribute='group') | reject('search','oinstall') | join(',') }}"
+
+- name: Add users belonging to oinstall and {{ oracle_group_list }} group
+  user:
+    name: "{{ oracle_user }}"
+    group: "oinstall"
+    groups: "{{ oracle_group_list }}"
+    state: present
+    append: yes
+    password: "{{ '{{ oracle_password }}' | password_hash('sha512') }}"
+
+- name: Changing  ownership, group and permissions
+  file:
+    path: "{{ item }}"
+    owner: oracle
+    group: oinstall
+    mode: '0755'
+  with_items:
+    - "{{ oracle_inventory }}"
+    - "{{ oracle_base }}"
+    - "{{ stage_dir }}"
+    - "{{ oracle_home }}"
+    - "{{ root_directory }}"
+    - "{{ sub_root_directory }}"
+
+#
+- name: Copy .bashrc into Oracle home directory
+  template: src=bashrc.j2 dest=/home/oracle/.bashrc owner=oracle group=oinstall mode=644 force=yes
+  register: oracle_bashrc_copied
+
+#
+- name: Copy Oracle Database software from Source to Target hosts
+  copy: src={{ oracle_binary }} dest=/home/oracle mode=0777
+  when: inventory_hostname in groups['databases']
+
+#
+- name: Check if any version of Oracle Database is already unpacked
+  stat: path=/u01/app/oracle/product/{{ oracle_version }}/dbhome_1
+  register: oracle_unpacked
+  when: inventory_hostname in groups['databases']
+
+#
+- name: Unpack Oracle Database Software to the target server
+  unarchive:
+    src: /home/oracle/{{ oracle_binary }}
+    dest: /u01/app/oracle/product/{{ oracle_version }}/dbhome_1
+    remote_src: yes
+  when: oracle_unpacked.stat.exists == True
+
+#
+- name: Setup Oracle database installation response file
+  template: src={{ oradbsoft_rsp }}.rsp.j2 dest={{ stage_dir }}/{{ oradbsoft_rsp }}.rsp mode=0755
+
+#
+- name: Changing  ownership, group and permissions
+  file:
+    path: "{{ item }}"
+    owner: oracle
+    group: oinstall
+    recurse: yes
+  with_items:
+    - "{{ oracle_home }}"
+    - "{{ app_dir }}"
+
+#
+- name: Verifying Oracle 19c Database Software installation pre-requisites
+  become_user: "{{ oracle_user }}"
+  shell: "{{ oracle_home }}/runInstaller -executePrereqs -silent -responseFile {{ stage_dir }}/{{ oradbsoft_rsp }}.rsp -noconfig -ignorePrereqFailure"
+  ignore_errors: True
+
+#
+- name: Staring Installation of Oracle Database Software
+  become_user: "{{ oracle_user }}"
+  shell: "export CV_ASSUME_DISTID=RHEL$(cat /etc/os-release | grep VERSION_ID | cut -d = -f 2 | sed 's/\"//g') && {{ oracle_home }}/runInstaller -silent -responseFile {{ stage_dir }}/{{ oradbsoft_rsp }}.rsp -noconfig -ignorePrereqFailure"
+  ignore_errors: True
+  register: command_output
+  # shell: "export CV_ASSUME_DISTID=RHEL8.5 && {{ oracle_home }}/runInstaller -silent -responseFile {{ stage_dir }}/{{ oradbsoft_rsp }}.rsp -noconfig -ignorePrereqFailure"
+
+#
+- debug:
+    var: command_output.stdout_lines
+
+#
+- name: Execute orainstroot.sh
+  remote_user: "{{ root_user }}"
+  shell: "{{ oracle_inventory }}/orainstRoot.sh"
+  ignore_errors: True
+
+#
+- name: Execute root.sh
+  command: "{{ oracle_home }}/root.sh -silent"
+  become: yes
+  become_user: root
+
