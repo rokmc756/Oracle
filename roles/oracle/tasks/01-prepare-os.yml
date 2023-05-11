@@ -1,0 +1,86 @@
+---
+# tasks file for oracle19c_install
+
+- name: Display pre database software install message
+  remote_user: "{{ root_user }}"
+  debug:
+    msg:
+      - 'Oracle Database Software 19c Installation started for Single Instance at {{ansible_date_time.iso8601}}:'
+
+#
+- name: Put SELinux in permissive mode, logging actions that would be blocked.
+  selinux:
+    policy: targeted
+    state: permissive
+
+#
+- name: Create the limit.conf and sysctl.conf for Oracle Database
+  become: true
+  template: src="{{ item.fn }}.j2" dest="{{ item.copy_dir }}/{{ item.fn }}" owner=root group=root mode=644 force=yes
+  register: oracle_config_created
+  with_items:
+    - { fn: "30-oracle-limits.conf", copy_dir: "/etc/security/limits.d" }
+    - { fn: "98-oracle-sysctl.conf", copy_dir: "/etc/sysctl.d" }
+  notify:
+    - Reload sysctl
+
+#
+- name: Open ports for Oracle Database
+  firewalld:
+    zone: public
+    port: "{{ item.port }}/{{ item.proto }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop: "{{ oracle_ports }}"
+
+#
+- name: Check if kernel boot parameters are already existed for Oracle Database
+  lineinfile:
+    path: /etc/default/grub
+    regexp: '^(GRUB_CMDLINE_LINUX=)(.*)(numa=off transparent_hugepage=never clocksource=tsc.*)(".*)$'
+    state: absent
+  check_mode: true
+  changed_when: false                               # This just makes things look prettier in the logs
+  register: oracle_boot_parameter_existed
+
+#
+- name: Tune boot kernel parameters for Oracle database
+  lineinfile:
+    path: /etc/default/grub
+    regexp: '^(GRUB_CMDLINE_LINUX=)(.*)(".*)$'
+    line: '\1\2 {{ item.option }}={{ item.value }}\3'
+    state: present
+    backrefs: yes
+    # backup: yes
+  with_items:
+    - { option: "numa", value: "off" }
+    - { option: "transparent_hugepage", value: "never" }
+    - { option: "clocksource", value: "tsc" }
+  when: oracle_boot_parameter_existed.found == 0
+# Need to understand the below
+# regexp: '^(GRUB_CMDLINE_LINUX=(?:(?![" ]{{ item.option | regex_escape }}=).)*"?)\s*(?:{{ item.option | regex_escape }}=\S+\s*)?(.*")$'
+
+#
+- name: Update grub2 config
+  shell: ( grub2-mkconfig -o /boot/grub2/grub.cfg )
+  notify:
+    - Restart system
+    - Waiting for server to come back after reboot
+
+- meta: flush_handlers
+
+# Need to check why the below is not worked
+#- name: Enable development package repository for Oracle Database
+#  become: yes
+#  yum_repository:
+#    name: devel
+#    description: Rocky Linux $releasever - Devel WARNING! FOR BUILDROOT AND KOJI USE
+#    mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=Devel-$releasever
+#    enabled: yes
+
+- name: Install dependent rpm packages to need installing Oracle Database
+  yum:
+    name: "{{ oracle_dep_rpms }}"
+    state: present
+    enablerepo: devel

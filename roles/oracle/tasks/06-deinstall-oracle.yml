@@ -1,0 +1,66 @@
+#
+- name: Stop Oracle Listener
+  become_user: "{{ oracle_user }}"
+  shell: "{{ oracle_home }}/bin/lsnrctl stop"
+  register: oracle_listener_stopped
+  ignore_errors: true
+
+#
+- debug: msg={{ oracle_listener_stopped }}
+  ignore_errors: true
+
+#
+- name: Check deinstall silently
+  become_user: "{{ oracle_user }}"
+  shell: "{{ oracle_home }}/deinstall/deinstall -silent -checkonly"
+  register: oracle_deinstall_checkonly
+  ignore_errors: true
+
+#
+- debug: msg={{ oracle_deinstall_checkonly }}
+  ignore_errors: true
+
+#
+- name: Set fact for the locatino of rsp file
+  set_fact:
+    rsp_location: "{{ (oracle_deinstall_checkonly.stdout_lines | select('search', 'deinstall_OraDB') | list | string | split(' '))[5] | regex_replace(\"'\", '') | regex_replace(']', '') | regex_replace('\"', '') }}"
+  delegate_to: "{{ item }}"
+  delegate_facts: True
+  ignore_errors: true
+  with_items: "{{ groups['all'] }}"
+  # when: inventory_hostname in groups['master']
+  # stdout[1:-1] --> Remove first and last character in a line
+
+#
+- debug: msg={{ rsp_location }}
+  ignore_errors: true
+
+#
+- name: Deinstall ORACLE_HOME
+  become_user: "{{ oracle_user }}"
+  shell: "{{ oracle_home }}/deinstall/deinstall -silent -local -paramfile {{ rsp_location }}"
+  register: oracle_home_deinstalled
+  ignore_errors: true
+
+#
+- debug: msg={{ oracle_home_deinstalled }}
+  ignore_errors: true
+
+#
+- name: Delete oratab, oraInst.loc and ORCLfmap to cleanup Oracle Installer
+  become_user: "{{ root_user }}"
+  file:
+    path: "{{ item }}"
+    state: absent
+  register: oracle_installer_cleanup
+  ignore_errors: true
+  with_items:
+    - "/etc/oraInst.loc"
+    - "/etc/oratab"
+    - "/opt/ORCLfmap"
+#    - "/u01"
+#    - "/u02"
+
+#
+- debug: msg={{ oracle_installer_cleanup }}
+  ignore_errors: true

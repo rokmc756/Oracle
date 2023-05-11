@@ -1,0 +1,46 @@
+---
+# tasks file for oracle19c_install
+#
+- name: Setup Oracle database installation response file
+  template: src={{ oradbsoft_rsp }}.rsp.j2 dest={{ stage_dir }}/{{ oradbsoft_rsp }}.rsp mode=0755
+
+#
+- name: Changing  ownership, group and permissions
+  file:
+    path: "{{ item }}"
+    owner: oracle
+    group: oinstall
+    recurse: yes
+  with_items:
+    - "{{ oracle_home }}"
+    - "{{ app_dir }}"
+
+#
+- name: Verifying Oracle 19c Database Software installation pre-requisites
+  become_user: "{{ oracle_user }}"
+  shell: "{{ oracle_home }}/runInstaller -executePrereqs -silent -responseFile {{ stage_dir }}/{{ oradbsoft_rsp }}.rsp -noconfig -ignorePrereqFailure"
+  ignore_errors: True
+
+#
+- name: Starting Installation of Oracle Database Software
+  become_user: "{{ oracle_user }}"
+  shell: "export CV_ASSUME_DISTID=RHEL$(cat /etc/os-release | grep VERSION_ID | cut -d = -f 2 | sed 's/\"//g') && {{ oracle_home }}/runInstaller -silent -responseFile {{ stage_dir }}/{{ oradbsoft_rsp }}.rsp -noconfig -ignorePrereqFailure"
+  ignore_errors: True
+  register: command_output
+  # shell: "export CV_ASSUME_DISTID=RHEL8.7 && {{ oracle_home }}/runInstaller -silent -responseFile {{ stage_dir }}/{{ oradbsoft_rsp }}.rsp -noconfig -ignorePrereqFailure"
+
+#
+- debug:
+    var: command_output.stdout_lines
+
+#
+- name: Execute orainstroot.sh
+  remote_user: "{{ root_user }}"
+  shell: "{{ oracle_inventory }}/orainstRoot.sh"
+  ignore_errors: True
+
+#
+- name: Execute root.sh
+  command: "{{ oracle_home }}/root.sh -silent"
+  become: yes
+  become_user: root

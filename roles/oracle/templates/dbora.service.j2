@@ -1,0 +1,13 @@
+[Unit]
+Description=Oracle Database {{ oracle_version }} Service
+After=network.target
+
+[Service]
+User=oracle
+Type=forking
+ExecStart={{ oracle_home }}/bin/dbstart {{ oracle_home }}
+ExecStop={{ oracle_home }}/bin/dbshut {{ oracle_home }}
+TimeoutSec=300s
+
+[Install]
+WantedBy=multi-user.target

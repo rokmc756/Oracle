@@ -51,6 +51,21 @@ init:	setup-hosts.yml update-hosts.yml
 install: role-update setup-hosts.yml
 	ansible-playbook --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -i ansible-hosts -u ${USERNAME} setup-hosts.yml --tags="install"
 
+prepare: role-update setup-hosts.yml
+	ansible-playbook --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -i ansible-hosts -u ${USERNAME} setup-hosts.yml --tags="prepare"
+
+deploy: role-update setup-hosts.yml
+	ansible-playbook --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -i ansible-hosts -u ${USERNAME} setup-hosts.yml --tags="deploy"
+
+setup: role-update setup-hosts.yml
+	ansible-playbook --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -i ansible-hosts -u ${USERNAME} setup-hosts.yml --tags="setup"
+
+config: role-update setup-hosts.yml
+	ansible-playbook --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -i ansible-hosts -u ${USERNAME} setup-hosts.yml --tags="config"
+
+deinstall: role-update setup-hosts.yml
+	ansible-playbook --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -i ansible-hosts -u ${USERNAME} setup-hosts.yml --tags="deinstall"
+
 uninstall: role-update setup-hosts.yml
 	ansible-playbook --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -i ansible-hosts -u ${USERNAME} setup-hosts.yml --tags="uninstall"
 

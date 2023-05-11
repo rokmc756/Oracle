@@ -126,6 +126,7 @@
     - "{{ oracle_home }}"
     - "{{ root_directory }}"
     - "{{ sub_root_directory }}"
+    - "{{ sub_oradata }}"
 
 #
 - name: Copy .bashrc into Oracle home directory
