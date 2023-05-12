@@ -18,7 +18,7 @@ Oracle Database 19c and 21c on RHEL and Rocky Linux 8.x has been verified
 MacOS or Fedora/CentOS/RHEL installed with ansible as ansible host.\
 At least three supported OS should be prepared with yum repository configured.
 
-# Prepare ansible host to run gpfarmer
+# Prepare ansible host to run oralce playbook
 * MacOS
 ~~~
 $ xcode-select --install
@@ -40,13 +40,14 @@ $ git clone https://github.com/rokmc756/oracle
 
 $ cd oracle
 
-Change password
+Change password\
 $ vi Makefile
 ~~~
 ANSIBLE_HOST_PASS="changeme"    # It should be changed with password of user in ansible host that sudo user would be run.
 ANSIBLE_TARGET_PASS="changeme"  # It should be changed with password of sudo user in managed nodes that sudo user would be installed.
 ~~~
 
+Change your sudo user and password on target host\
 $ vi ansible-hosts
 ~~~
 [all:vars]
@@ -58,7 +59,7 @@ remote_machine_password="changeme"   # Replace with password of sudo user
 rk8-oracle ansible_ssh_host=192.168.0.189    # Change IP address of oracle host
 ~~~
 
-Set version and binary filename of Oracle
+Set version and binary filename of Oracle\
 $ vi role/oracle/var/mail.yml
 ~~~
 ~~ snip
@@ -70,11 +71,9 @@ oracle_binary:      "LINUX.X64_213000_db_home.zip"
 # You could modify manh options such as user, password and the location of directories and so on here
 ~~~
 
-Download Oracle Binary for the the following link - https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html
-Lacate it into role/oracle/files directory
-~~~
+Download Oracle Binary for the the following link - https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html\
+Lacate it into role/oracle/files directory\
 $ mv LINUX.X64_193000_db_home.zip role/oracle/files   # or LINUX.X64_213000_db_home.zip
-~~~
 
 $ vi setup-hosts.yml
 ~~~
@@ -91,12 +90,12 @@ $ make deploy
 $ make setup
 $ make config
 
-Run the following script To uninstall oracle after modifying your user and hostname
+Run the following script To uninstall oracle after modifying your user and hostname\
 $ sh force_remove_oracle.sh
 
-Run make deinstall if you just want to destroy oracle software only.
+Run make deinstall if you just want to destroy oracle software only.\
 $ make deinstall
 
 # Planning
-Add uninstall and upgraded playbook
+Add uninstall and upgraded playbook\
 Consider playbook to add RAC referring to this link - https://github.com/oravirt/ansible-oracle
