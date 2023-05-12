@@ -105,7 +105,7 @@ $ make config
 ~~~
 $ sh force_remove_oracle.sh
 ~~~
-* Run make deinstall if you just want to destroy oracle software only.
+* Run make deinstall if you just want to destroy oracle software only deployed at $ORACLE_HOME directory.
 ~~~
 $ make deinstall
 ~~~
