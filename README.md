@@ -1,11 +1,12 @@
 # What is the purpose and intension of this oracle playbook?
-This playbook is intended to deploy Oracle Database conveniently, configure remote connection, create new users and change pasword of sys,system users and so on on Baremetal,Virtual Machines and Cloud Infrastructure.
-Because there would be many opportunities to simulate or reproduce issues in development or test environment if you are running oracle in production. If you are quite farmilar with ansible and oracle could you also utilize it into your production
-As it provides easy and quick installation and uninstallation you could use efficently your hardware resources especially in case who you are developer,dba and system administartor / engineer and so on.
+This playbook is intended to deploy/install Oracle Database easily and conveniently, configure remote connection, create new users and change pasword of sys,system users and so on on Baremetal, Virtual Machines and Cloud Infrastructure.
+Because there would be many opportunities to simulate or reproduce issues on development or test environment if you are running Oracle Database and encounter issues  in production.
+If you are quite farmilar with ansible and Oracle Database you could also utilize it in your production.
+As it provides easy and quick installation and uninstallation you could use efficently your hardware or virtualization resources especially in case who you are developer,dba and system administartor / engineer and so on.
 
 # Where is it orignially came from and how has it been changed?
+Basic playbook was came from the following article. Howerver there has been many changes based on ansible role, configuring OS environment and user and password settings and so on.
 https://facedba.blogspot.com/2022/04/install-oracle-19c-database-software.html
-Basic playbook was came from the above article. Howerver there has been many changes based on role, configuring OS environment and user and password settings and so on.
 
 # Supported Oracle Database, Platform and OS
 Virtual Machines
@@ -15,7 +16,7 @@ Oracle Database 19c and 21c on RHEL and Rocky Linux 8.x has been verified
 
 # Prerequisite
 MacOS or Fedora/CentOS/RHEL installed with ansible as ansible host.
-At least three supported OS should be prepared with yum repository configured
+At least three supported OS should be prepared with yum repository configured.
 
 # Prepare ansible host to run gpfarmer
 * MacOS
