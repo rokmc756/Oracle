@@ -40,6 +40,7 @@ $ git clone https://github.com/rokmc756/oracle
 
 $ cd oracle
 
+Change password
 $ vi Makefile
 ~~~
 ANSIBLE_HOST_PASS="changeme"    # It should be changed with password of user in ansible host that sudo user would be run.
@@ -57,6 +58,7 @@ remote_machine_password="changeme"   # Replace with password of sudo user
 rk8-oracle ansible_ssh_host=192.168.0.189    # Change IP address of oracle host
 ~~~
 
+Set version and binary filename of Oracle
 $ vi role/oracle/var/mail.yml
 ~~~
 ~~ snip
@@ -68,11 +70,11 @@ oracle_binary:      "LINUX.X64_213000_db_home.zip"
 # You could modify manh options such as user, password and the location of directories and so on here
 ~~~
 
-# Download Oracle Binary 
-$ copy 
+Download Oracle Binary for the the following link - https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html
 Lacate it into role/oracle/files directory
-$ mv LINUX.X64_193000_db_home.zip LINUX.X64_213000_db_home.zip role/oracle/files
-https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html
+~~~
+$ mv LINUX.X64_193000_db_home.zip role/oracle/files   # or LINUX.X64_213000_db_home.zip
+~~~
 
 $ vi setup-hosts.yml
 ~~~
