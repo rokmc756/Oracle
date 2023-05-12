@@ -1,16 +1,98 @@
-# cd /root/work
-# ansible-playbook oracle19c_rdbmsinstall.yml --skip-tags=db19c_exeorainstroot,db19c_exeroot
---- during running of play book 
-[root@ansible01 work]# ansible-playbook oracle19c_rdbmsinstall.yml --skip-tags=db19c_exeorainstroot,db19c_exeroot
+# What is the purpose and intension of this oracle playbook?
+This playbook is intended to deploy Oracle Database conveniently, configure remote connection, create new users and change pasword of sys,system users and so on on Baremetal,Virtual Machines and Cloud Infrastructure.
+Because there would be many opportunities to simulate or reproduce issues in development or test environment if you are running oracle in production. If you are quite farmilar with ansible and oracle could you also utilize it into your production
+As it provides easy and quick installation and uninstallation you could use efficently your hardware resources especially in case who you are developer,dba and system administartor / engineer and so on.
 
-
+# Where is it orignially came from and how has it been changed?
 https://facedba.blogspot.com/2022/04/install-oracle-19c-database-software.html
+Basic playbook was came from the above article. Howerver there has been many changes based on role, configuring OS environment and user and password settings and so on.
 
+# Supported Oracle Database, Platform and OS
+Virtual Machines
+Cloud Infrastructure
+Baremetal
+Oracle Database 19c and 21c on RHEL and Rocky Linux 8.x has been verified
 
-[oracle@rk8-single-db dbhome_1]$ export CV_ASSUME_DISTID=RHEL8.5 && ./runInstaller -silent -responseFile /u01/stage/19cEE_SoftOnly.rsp -noconfig -ignorePrereqFailure
-Launching Oracle Database Setup Wizard...
+# Prerequisite
+MacOS or Fedora/CentOS/RHEL installed with ansible as ansible host.
+At least three supported OS should be prepared with yum repository configured
 
-[WARNING] [INS-35950] Installer has detected an invalid entry in the central inventory corresponding to Oracle home (/u01/app/oracle/product/19c/dbhome_1).
-   ACTION: Choose a different location as Oracle home.
-The response file for this session can be found at:
- /u01/app/oracle/product/19c/dbhome_1/install/response/db_2023-05-08_02-21-56AM.rsp
+# Prepare ansible host to run gpfarmer
+* MacOS
+~~~
+$ xcode-select --install
+$ brew install ansible
+$ brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb
+~~~
+
+* Fedora/CentOS/RHEL
+~~~
+$ sudo yum install ansible
+$ sudo yum install sshpass
+~~~
+
+## Prepareing OS
+Configure Yum / Local & EPEL Repostiory
+
+# Download / configure / run gpfarmer
+$ git clone https://github.com/rokmc756/oracle
+
+$ cd oracle
+
+$ vi Makefile
+~~~
+ANSIBLE_HOST_PASS="changeme"    # It should be changed with password of user in ansible host that sudo user would be run.
+ANSIBLE_TARGET_PASS="changeme"  # It should be changed with password of sudo user in managed nodes that sudo user would be installed.
+~~~
+
+$ vi ansible-hosts
+~~~
+[all:vars]
+ssh_key_filename="id_rsa"
+remote_machine_username="jomoon"     # Replace with username of sudo user
+remote_machine_password="changeme"   # Replace with password of sudo user
+
+[databases]
+rk8-oracle ansible_ssh_host=192.168.0.189    # Change IP address of oracle host
+~~~
+
+$ vi role/oracle/var/mail.yml
+~~~
+~~ snip
+oracle_major_version: "19"
+oracle_patch_version: "c"
+~~ snip
+oracle_binary:      "LINUX.X64_213000_db_home.zip"
+~~ snip
+# You could modify manh options such as user, password and the location of directories and so on here
+~~~
+
+# Download Oracle Binary 
+$ copy 
+Lacate it into role/oracle/files directory
+$ mv LINUX.X64_193000_db_home.zip LINUX.X64_213000_db_home.zip role/oracle/files
+
+$ vi setup-hosts.yml
+~~~
+---
+- hosts: rk8-oracle
+  become: yes
+  roles:
+    - oracle
+~~~
+$ make install
+or
+$ make prepare
+$ make deploy
+$ make setup
+$ make config
+
+Run the following script To uninstall oracle after modifying your user and hostname
+$ sh force_remove_oracle.sh
+
+Run make deinstall if you just want to destroy oracle software only.
+$ make deinstall
+
+# Planning
+Add uninstall and upgraded playbook
+Consider playbook to add RAC referring to this link - https://github.com/oravirt/ansible-oracle
