@@ -36,20 +36,25 @@ $ sudo yum install sshpass
 Configure Yum / Local & EPEL Repostiory
 
 # Download / configure / run oracle playbook
-$ git clone https://github.com/rokmc756/oracle
-
-$ cd oracle
-
-Change password\
-$ vi Makefile
+* Clone orlace playbook into your local machine
 ~~~
+$ git clone https://github.com/rokmc756/oracle
+~~~
+* Go to oracle directory
+~~~
+$ cd oracle
+~~~
+* Change password for sudo user of ansible or target host
+~~~
+$ vi Makefile
+~~ snip
 ANSIBLE_HOST_PASS="changeme"    # It should be changed with password of user in ansible host that sudo user would be run.
 ANSIBLE_TARGET_PASS="changeme"  # It should be changed with password of sudo user in managed nodes that sudo user would be installed.
+~~ snip
 ~~~
-
-Change your sudo user and password on target host\
+* Change your sudo user and password on target host
+~~~
 $ vi ansible-hosts
-~~~
 [all:vars]
 ssh_key_filename="id_rsa"
 remote_machine_username="jomoon"     # Replace with username of sudo user
@@ -58,10 +63,9 @@ remote_machine_password="changeme"   # Replace with password of sudo user
 [databases]
 rk8-oracle ansible_ssh_host=192.168.0.189    # Change IP address of oracle host
 ~~~
-
-Set version and binary filename of Oracle\
-$ vi role/oracle/var/mail.yml
+* Set version and binary filename of Oracle\
 ~~~
+$ vi role/oracle/var/mail.yml
 ~~ snip
 oracle_major_version: "19"
 oracle_patch_version: "c"
@@ -70,18 +74,23 @@ oracle_binary:      "LINUX.X64_213000_db_home.zip"
 ~~ snip
 # You could modify manh options such as user, password and the location of directories and so on here
 ~~~
-
-Download Oracle Binary for the the following link - https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html\
-Lacate it into role/oracle/files directory\
-$ mv LINUX.X64_193000_db_home.zip role/oracle/files   # or LINUX.X64_213000_db_home.zip
-
-$ vi setup-hosts.yml
+* Download Oracle Binary for the the following link - https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html\
+Lacate it into role/oracle/files directory
 ~~~
+$ mv LINUX.X64_193000_db_home.zip role/oracle/files
+# If you want to use 21 version,
+$ mv LINUX.X64_213000_db_home.zip role/oracle/files
+~~~
+* Set hosts and role name
+~~~
+$ vi setup-hosts.yml
 ---
 - hosts: rk8-oracle
   become: yes
   roles:
     - oracle
+~~~
+* Install Oracle Database at once or seperately
 ~~~
 $ make install
 or
@@ -89,12 +98,15 @@ $ make prepare
 $ make deploy
 $ make setup
 $ make config
-
-Run the following script To uninstall oracle after modifying your user and hostname\
+~~~
+* Run the following script To uninstall oracle after modifying your user and hostname
+~~~
 $ sh force_remove_oracle.sh
-
-Run make deinstall if you just want to destroy oracle software only.\
+~~~
+* Run make deinstall if you just want to destroy oracle software only.
+~~~
 $ make deinstall
+~~~
 
 # Planning
 Add uninstall and upgraded playbook\
