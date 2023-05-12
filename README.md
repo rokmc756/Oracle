@@ -1,6 +1,8 @@
 # What is the purpose and intension of this oracle playbook?
 This playbook is intended to deploy/install Oracle Database easily and conveniently, configure remote connection, create new users and change pasword of sys,system users and so on on Baremetal, Virtual Machines and Cloud Infrastructure.\
+\
 Because there would be many opportunities to simulate or reproduce issues on development or test environment if you are running Oracle Database and encounter issues  in production.\
+\
 If you are quite farmilar with ansible and Oracle Database you could also utilize it in your production.\
 As it provides easy and quick installation and uninstallation you could use efficently your hardware or virtualization resources especially in case who you are developer,dba and system administartor / engineer and so on.
 
@@ -63,7 +65,7 @@ remote_machine_password="changeme"   # Replace with password of sudo user
 [databases]
 rk8-oracle ansible_ssh_host=192.168.0.189    # Change IP address of oracle host
 ~~~
-* Set version and binary filename of Oracle\
+* Set version and binary filename of Oracle
 ~~~
 $ vi role/oracle/var/mail.yml
 ~~ snip
@@ -72,10 +74,10 @@ oracle_patch_version: "c"
 ~~ snip
 oracle_binary:      "LINUX.X64_213000_db_home.zip"
 ~~ snip
-# You could modify manh options such as user, password and the location of directories and so on here
+# You could modify many options such as user, password and the location of directories and so on at here
 ~~~
-* Download Oracle Binary for the the following link - https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html\
-Lacate it into role/oracle/files directory
+Download Oracle Binary for the the following link - https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html\
+* Lacate it into role/oracle/files directory
 ~~~
 $ mv LINUX.X64_193000_db_home.zip role/oracle/files
 # If you want to use 21 version,
