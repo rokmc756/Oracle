@@ -35,7 +35,7 @@ $ sudo yum install sshpass
 ## Prepareing OS
 Configure Yum / Local & EPEL Repostiory
 
-# Download / configure / run gpfarmer
+# Download / configure / run oracle playbook
 $ git clone https://github.com/rokmc756/oracle
 
 $ cd oracle
@@ -72,6 +72,7 @@ oracle_binary:      "LINUX.X64_213000_db_home.zip"
 $ copy 
 Lacate it into role/oracle/files directory
 $ mv LINUX.X64_193000_db_home.zip LINUX.X64_213000_db_home.zip role/oracle/files
+https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html
 
 $ vi setup-hosts.yml
 ~~~
