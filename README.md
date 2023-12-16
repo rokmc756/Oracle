@@ -76,15 +76,15 @@ oracle_binary:      "LINUX.X64_213000_db_home.zip"
 ~~ snip
 # You could modify many options such as user, password and the location of directories and so on at here
 ```
-Download Oracle Binary for the the following link\
+#### 6) Download Oracle Binary for the the following link
 https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html
-#### 6) Lacate it into role/oracle/files directory
+#### 7) Lacate it into role/oracle/files directory
 ```
 $ mv LINUX.X64_193000_db_home.zip role/oracle/files
 # If you want to use 21 version,
 $ mv LINUX.X64_213000_db_home.zip role/oracle/files
 ```
-#### 7) Set hosts and role name
+#### 8) Set hosts and role name
 ```
 $ vi setup-hosts.yml
 ---
@@ -93,7 +93,7 @@ $ vi setup-hosts.yml
   roles:
     - oracle
 ```
-#### 8) Install Oracle Database at once or seperately
+#### 9) Install Oracle Database at once or seperately
 ```
 $ make install
 or
@@ -102,11 +102,11 @@ $ make deploy
 $ make setup
 $ make config
 ```
-#### 9) Run the following script To uninstall oracle after modifying your user and hostname
+#### 10) Run the following script To uninstall oracle after modifying your user and hostname
 ```
 $ sh force_remove_oracle.sh
 ```
-#### 10) Run make deinstall if you just want to destroy oracle software only deployed at $ORACLE_HOME directory.
+#### 11) Run make deinstall if you just want to destroy oracle software only deployed at $ORACLE_HOME directory.
 ```
 $ make deinstall
 ```
