@@ -76,7 +76,8 @@ oracle_binary:      "LINUX.X64_213000_db_home.zip"
 ~~ snip
 # You could modify many options such as user, password and the location of directories and so on at here
 ```
-Download Oracle Binary for the the following link - https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html\
+Download Oracle Binary for the the following link\
+https://www.oracle.com/kr/database/technologies/oracle-database-software-downloads.html\
 #### 6) Lacate it into role/oracle/files directory
 ```
 $ mv LINUX.X64_193000_db_home.zip role/oracle/files
