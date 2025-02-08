@@ -30,7 +30,7 @@ shutdown:
 
 # For All Roles
 %:
-	@ln -sf ansible-hosts-rk8-oracle ansible-hosts;
+	@ln -sf ansible-hosts-rk8-single-db ansible-hosts;
 	@cat Makefile.tmp  | sed -e 's/temp/${*}/g' > Makefile.${*}
 	@cat setup-temp.yml.tmp | sed -e 's/    - temp/    - ${*}/g' > setup-${*}.yml
 	@make -f Makefile.${*} r=${r} s=${s} c=${c} USERNAME=${USERNAME}
