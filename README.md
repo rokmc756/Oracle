@@ -127,12 +127,15 @@ $ mv LINUX.X64_213000_db_home.zip role/oracle/files
 ```
 #### 8) Set hosts and role name
 ```
-$ vi setup-hosts.yml
+$ vi setup-temp.yml.tmp
 ---
-- hosts: rk8-oracle
+- hosts: all
   become: yes
+  gather_facts: true
+  vars:
+    print_debug: true
   roles:
-    - oracle
+    - temp
 ```
 #### 9) Install Oracle Database at Once or Seperately
 ```
