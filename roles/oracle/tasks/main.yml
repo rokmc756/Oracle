@@ -40,7 +40,7 @@
 
 
 - name: Tune Init Ora Parameters
-  import_tasks: tune-init-ora.yml
+  import_tasks: ext/tune-init-ora.yml
   tags: config, install
   when: ( ora is defined and ora == true ) or ( oracle_all is defined and oracle_all == true )
 
@@ -58,37 +58,37 @@
 
 
 - name: Create Multi Tenant Oracle Database
-  import_tasks: 06-create-multi-tenant-db.yml
+  import_tasks: 07-create-multi-tenant-db.yml
   tags: create, install
   when: ( db is defined and db == true ) or ( oracle_all is defined and oracle_all == true )
 
 
 - name: Delete Init Ora Parameters
-  import_tasks: rollback-init-ora.yml
+  import_tasks: ext/rollback-init-ora.yml
   tags: remove, delete, install
   when: ( ora is defined and ora == true ) or ( oracle_all is defined and oracle_all == true )
 
 
 - name: Copy Query Examples
-  import_tasks: 07-copy-query-examples.yml
+  import_tasks: 08-copy-query-examples.yml
   tags: copy, install
   when: ( examples is defined and examples == true ) or ( oracle_all is defined and oracle_all == true )
 
 
 - name: Enable OMF Autostart
-  import_tasks: 08-enable-autostart.yml
+  import_tasks: 09-enable-autostart.yml
   tags: enable, install
   when: ( omf is defined and omf == true ) or ( oracle_all is defined and oracle_all == true )
 
 
 - name: Create Users
-  import_tasks: 09-create-users.yml
+  import_tasks: 10-create-users.yml
   tags: create, add, install
   when: ( users is defined and users == true ) or ( oracle_all is defined and oracle_all == true )
 
 
 - name: Enable Remote Connect
-  import_tasks: 10-enable-remote-connect.yml
+  import_tasks: 11-enable-remote-connect.yml
   tags: enable, install
   when: ( remote is defined and remote == true ) or ( oracle_all is defined and oracle_all == true )
 

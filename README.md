@@ -167,7 +167,7 @@ $ make oracle r=deinstall s=db
 $ make oracle r=disable s=swap
 
 or
-$ make oracle r=uninstall s=all
+$ make oracle r=uninstall s=all (X)
 ```
 
 
@@ -180,9 +180,9 @@ $ make oracle r=stop s=db
 
 
 ## Planning
-Add uninstall and upgraded playbook\
-Consider playbook to add RAC referring to this link - https://github.com/oravirt/ansible-oracle
-
-
-
+- [X] Add Uninstall
+- [ ] Deinstall Not Working Currently
+- [ ] Need Imporovement to Create Multi Tenant Databases -  https://mikedietrichde.com/2018/11/13/how-to-speed-up-multitenant-custom-database-creation/
+- [ ] ADD Upgrade
+- [ ] Consider playbook to add RAC referring to this link - https://github.com/oravirt/ansible-oracle
 
