@@ -1,2 +1,98 @@
+---
 ansible_ssh_pass: changeme
 ansible_become_pass: changeme
+
+_oracle:
+  cluster_name: jack-kr-oracle
+  major_version: "21"
+  minor_version: ""
+  patch_version: "c"
+  build_version: ""
+  os_version: el8
+  arch_type: x86_64
+  bin_type: rpm
+  db_name: oracle_testdb
+  db_user: jomoon
+  domain: "jtest.pivotal.io"
+  repo_url: ""
+  download_url: ""
+  download: false
+  host_num: "{{ groups['all'] | length }}"
+  base_path: "/root"
+  user:               "oracle"
+  password:           "changeme"
+  root_user:          "root"
+  mount_directory:    "/"
+  root_directory:     "/u01"
+  app_dir:            "/u01/app"
+  stage_dir:          "/u01/stage"
+  sub_root_directory: "/u02"
+  sub_oradata:        "/u02/oradata"
+  base_dir:           "/u01/app/oracle"
+  inventory:          "/u01/app/oraInventory"
+  scripts_directory:  "/u01/app/scripts"
+  home_dir:           "/u01/app/oracle/product/21c/dbhome_1"
+  rsp:                "Oracle_EE_SoftOnly"
+  binary:             "LINUX.X64_193000_db_home.zip"  #  "LINUX.X64_213000_db_home.zip"
+  install_group:
+    - { group: "oinstall",  gid: "1501" }
+    - { group: "dba",       gid: "1502" }
+    - { group: "oper",      gid: "1503" }
+    - { group: "backupdba", gid: "1504" }
+    - { group: "dgdba",     gid: "1505" }
+    - { group: "kmdba",     gid: "1506" }
+    - { group: "racdba",    gid: "1507" }
+  ports:
+    - { proto: "tcp",       port: "1521" }
+    - { proto: "tcp",       port: "5500" }
+    - { proto: "tcp",       port: "5520" }
+    - { proto: "tcp",       port: "3938" }
+  net:
+    type: "virtual"                # Or Physical
+    gateway: "192.168.0.1"
+    ipaddr0: "192.168.0.15"
+    ipaddr1: "192.168.1.15"
+    ipaddr2: "192.168.2.15"
+  client:
+    net:
+      type: "virtual"              # Or Physical
+      cores: 1
+      ipaddr0: "192.168.0.15"
+      ipaddr1: "192.168.1.15"
+      ipaddr2: "192.168.2.15"
+  vms:
+    rk9: [ "rk8-oracle", "rk9-freeipa" ]
+    ubt24: [ "ubt24-oracle", "rk9-freeipa" ]
+  debug_opt: ""  # --debug
+
+
+_jdk:
+  oss:
+    install: true
+    jvm_home: "/usr/lib/jvm"
+    major_version: "1"
+    minor_version: "8"
+    patch_version: "0"
+    # 1.8.0
+    # 11.0.4
+    # 17.0.2
+  oracle:
+    install: false
+    jvm_home: "/usr/lib/jvm"
+    major_version: "13"
+    minor_version: "0"
+    patch_version: "2"
+    download: false
+
+
+vmware:
+  esxi_hostname: "192.168.0.231"
+  esxi_username: "root"
+  esxi_password: "Changeme34#$"
+
+
+kvm:
+  hostname: "192.168.0.101"
+  username: "root"
+  password: "changeme"
+

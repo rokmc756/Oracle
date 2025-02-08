@@ -1,4 +1,4 @@
-## What is the purpose and intension of this oracle playbook?
+## What is the Purpose and Intension of this Oracle Playbook?
 This playbook is intended to deploy/install Oracle Database easily and conveniently, configure remote connection, create new users and change pasword of sys,system users and so on on Baremetal, Virtual Machines and Cloud Infrastructure.\
 \
 Because there would be many opportunities to simulate or reproduce issues on development or test environment if you are running Oracle Database and encounter issues  in production.\
@@ -37,14 +37,14 @@ $ sudo yum install sshpass
 ## Prepareing OS
 Configure Yum / Local & EPEL Repostiory
 
-## Download / configure / run oracle playbook
-#### 1) Clone orlace playbook into your local machine
+## Download / Configure / Run Oracle Playbook
+#### 1) Clone Oracle Playbook into Your Local Machine
 ```
-$ git clone https://github.com/rokmc756/oracle
+$ git clone https://github.com/rokmc756/Oracle
 ```
 #### 2)  Go to oracle directory
 ```
-$ cd oracle
+$ cd Oracle
 ```
 #### 3) Change password for sudo user of ansible or target host
 ```
@@ -63,16 +63,57 @@ remote_machine_username="jomoon"     # Replace with username of sudo user
 remote_machine_password="changeme"   # Replace with password of sudo user
 
 [databases]
-rk8-oracle ansible_ssh_host=192.168.0.189    # Change IP address of oracle host
+rk8-oracle ansible_ssh_host=192.168.2.153    # Change IP address of oracle host
 ```
-#### 5) Set version and binary filename of Oracle
+#### 5) Set Oracle Version and Binary Filename
 ```
-$ vi role/oracle/var/mail.yml
+$ vi group_vars/all.yml
 ~~ snip
-oracle_major_version: "19"
-oracle_patch_version: "c"
-~~ snip
-oracle_binary:      "LINUX.X64_213000_db_home.zip"
+_oracle:
+  cluster_name: jack-kr-oracle
+  major_version: "21"
+  minor_version: ""
+  patch_version: "c"
+  build_version: ""
+  os_version: el8
+  arch_type: x86_64
+  bin_type: rpm
+  db_name: oracle_testdb
+  db_user: jomoon
+  domain: "jtest.pivotal.io"
+  repo_url: ""
+  download_url: ""
+  download: false
+  host_num: "{{ groups['all'] | length }}"
+  base_path: "/root"
+  user:               "oracle"
+  password:           "changeme"
+  root_user:          "root"
+  mount_directory:    "/"
+  root_directory:     "/u01"
+  app_dir:            "/u01/app"
+  stage_dir:          "/u01/stage"
+  sub_root_directory: "/u02"
+  sub_oradata:        "/u02/oradata"
+  base_dir:           "/u01/app/oracle"
+  inventory:          "/u01/app/oraInventory"
+  scripts_directory:  "/u01/app/scripts"
+  home_dir:           "/u01/app/oracle/product/21c/dbhome_1"
+  rsp:                "Oracle_EE_SoftOnly"
+  binary:             "LINUX.X64_193000_db_home.zip"  #  "LINUX.X64_213000_db_home.zip"
+  install_group:
+    - { group: "oinstall",  gid: "1501" }
+    - { group: "dba",       gid: "1502" }
+    - { group: "oper",      gid: "1503" }
+    - { group: "backupdba", gid: "1504" }
+    - { group: "dgdba",     gid: "1505" }
+    - { group: "kmdba",     gid: "1506" }
+    - { group: "racdba",    gid: "1507" }
+  ports:
+    - { proto: "tcp",       port: "1521" }
+    - { proto: "tcp",       port: "5500" }
+    - { proto: "tcp",       port: "5520" }
+    - { proto: "tcp",       port: "3938" }
 ~~ snip
 # You could modify many options such as user, password and the location of directories and so on at here
 ```
@@ -93,24 +134,52 @@ $ vi setup-hosts.yml
   roles:
     - oracle
 ```
-#### 9) Install Oracle Database at once or seperately
+#### 9) Install Oracle Database at Once or Seperately
 ```
-$ make install
+$ make oracle r=prepare s=os
+$ make oracle r=setup s=pkgs
+$ make oracle r=create s=swap
+$ make oracle r=prepare s=db
+$ make oracle r=setup s=db
+$ make oracle r=config s=ora
+$ make oracle r=deploy s=db
+$ make oracle r=config s=db
+$ make oracle r=create s=db
+$ make oracle r=remove s=ora
+$ make oracle r=copy s=examples
+$ make oracle r=enable s=omf
+$ make oracle r=create s=users
+$ make oracle r=enable s=remote
+
 or
-$ make prepare
-$ make deploy
-$ make setup
-$ make config
+$ make oracle r=install s=all
 ```
 #### 10) Run the following script To uninstall oracle after modifying your user and hostname
 ```
-$ sh force_remove_oracle.sh
+$ make oracle r=delete s=force
 ```
 #### 11) Run make deinstall if you just want to destroy oracle software only deployed at $ORACLE_HOME directory.
 ```
-$ make deinstall
+$ make oracle r=deinstall s=db
+$ make oracle r=disable s=swap
+
+or
+$ make oracle r=uninstall s=all
 ```
+
+
+#### 12) Start and Stop Oracle Database Service
+
+```
+$ make oracle r=start s=db
+$ make oracle r=stop s=db
+```
+
 
 ## Planning
 Add uninstall and upgraded playbook\
 Consider playbook to add RAC referring to this link - https://github.com/oravirt/ansible-oracle
+
+
+
+

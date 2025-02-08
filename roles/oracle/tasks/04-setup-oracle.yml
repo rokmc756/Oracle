@@ -1,46 +1,23 @@
 ---
-# tasks file for oracle19c_install
-#
-- name: Setup Oracle database installation response file
-  template: src={{ oradbsoft_rsp }}.rsp.j2 dest={{ stage_dir }}/{{ oradbsoft_rsp }}.rsp mode=0755
+- name: Check if Oracle Database Software Already Exists
+  stat: path=/home/oracle/{{ _oracle.binary }}
+  register: check_oracle_bin
 
-#
-- name: Changing  ownership, group and permissions
-  file:
-    path: "{{ item }}"
-    owner: oracle
-    group: oinstall
-    recurse: yes
-  with_items:
-    - "{{ oracle_home }}"
-    - "{{ app_dir }}"
 
-#
-- name: Verifying Oracle 19c Database Software installation pre-requisites
-  become_user: "{{ oracle_user }}"
-  shell: "{{ oracle_home }}/runInstaller -executePrereqs -silent -responseFile {{ stage_dir }}/{{ oradbsoft_rsp }}.rsp -noconfig -ignorePrereqFailure"
-  ignore_errors: True
+- name: Copy Oracle Database Software from Source to Target Host
+  copy: src={{ _oracle.binary }} dest=/home/oracle mode=0777
+  when: check_oracle_bin.stat.exists != True
 
-#
-- name: Starting Installation of Oracle Database Software
-  become_user: "{{ oracle_user }}"
-  shell: "export CV_ASSUME_DISTID=RHEL$(cat /etc/os-release | grep VERSION_ID | cut -d = -f 2 | sed 's/\"//g') && {{ oracle_home }}/runInstaller -silent -responseFile {{ stage_dir }}/{{ oradbsoft_rsp }}.rsp -noconfig -ignorePrereqFailure"
-  ignore_errors: True
-  register: command_output
-  # shell: "export CV_ASSUME_DISTID=RHEL8.7 && {{ oracle_home }}/runInstaller -silent -responseFile {{ stage_dir }}/{{ oradbsoft_rsp }}.rsp -noconfig -ignorePrereqFailure"
 
-#
-- debug:
-    var: command_output.stdout_lines
+- name: Check if Any Version of Oracle Database is Already Unpacked
+  stat: path=/u01/app/oracle/product/{{ oracle_version }}/dbhome_1
+  register: check_oracle_unpacked
 
-#
-- name: Execute orainstroot.sh
-  remote_user: "{{ root_user }}"
-  shell: "{{ oracle_inventory }}/orainstRoot.sh"
-  ignore_errors: True
 
-#
-- name: Execute root.sh
-  command: "{{ oracle_home }}/root.sh -silent"
-  become: yes
-  become_user: root
+- name: Unpack Oracle Database Software to the Target Host
+  unarchive:
+    src: /home/oracle/{{ _oracle.binary }}
+    dest: /u01/app/oracle/product/{{ oracle_version }}/dbhome_1
+    remote_src: yes
+  # when: check_oracle_unpacked.stat.exists != True
+

@@ -1,0 +1,21 @@
+---
+- name: Copy Script Template to Create Oracle Multi-Tenant Database
+  become_user: "{{ _oracle.user }}"
+  template: src={{ item.fn }}.j2 dest={{ item.copy_dir }}/{{ item.fn }} owner=oracle group=oinstall mode=0755 force=yes
+  register: copy_script_multi_tenant_db
+  with_items:
+    - { fn: "create-multi-tenant-db.sh", copy_dir: "{{ _oracle.home_dir }}" }
+- debug: msg={{ copy_script_multi_tenant_db }}
+
+
+- name: Create and Oracle Multi-Tenant Database
+  become_user: "{{ _oracle.user }}"
+  shell: |
+    source ~/.bashrc && {{ _oracle.home_dir }}/create-multi-tenant-db.sh
+  async: 2000
+  poll: 20
+  register: create_oracle_multi_tenant_db
+- debug: msg={{ create_oracle_multi_tenant_db }}
+
+# https://mikedietrichde.com/2018/11/13/how-to-speed-up-multitenant-custom-database-creation/
+

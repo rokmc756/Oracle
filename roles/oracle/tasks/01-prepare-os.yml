@@ -1,76 +1,95 @@
 ---
-# tasks file for oracle19c_install
-
-- name: Display pre database software install message
-  remote_user: "{{ root_user }}"
+- name: Display pre Database Software Install Message
+  remote_user: "{{ _oracle.root_user }}"
   debug:
     msg:
-      - 'Oracle Database Software 19c Installation started for Single Instance at {{ansible_date_time.iso8601}}:'
+      - 'Oracle Database Software {{ oracle_version }} Installation started for Single Instance at {{ ansible_date_time.iso8601 }}:'
 
-#
-- name: Put SELinux in permissive mode, logging actions that would be blocked.
+
+- name: Put SELinux in Permissive mode, Logging Actions that Would be Blocked
   selinux:
     policy: targeted
     state: permissive
+  register: set_selinux_permissive
+- debug: msg={{ set_selinux_permissive }}
 
-#
-- name: Create the limit.conf and sysctl.conf for Oracle Database
-  become: true
-  template: src="{{ item.fn }}.j2" dest="{{ item.copy_dir }}/{{ item.fn }}" owner=root group=root mode=644 force=yes
-  register: oracle_config_created
+
+- name: Create the limit.conf and sysctl.conf
+  template:
+    src: "{{ item.fn }}.j2"
+    dest: "{{ item.copy_dir }}/{{ item.fn }}"
+    owner: root
+    group: root
+    mode: 644
+    force: yes
+  register: create_oracle_config
   with_items:
     - { fn: "30-oracle-limits.conf", copy_dir: "/etc/security/limits.d" }
     - { fn: "98-oracle-sysctl.conf", copy_dir: "/etc/sysctl.d" }
   notify:
-    - Reload sysctl
+    - Reload Sysctl
+- debug: msg={{ create_oracle_config }}
 
-#
-- name: Open ports for Oracle Database
+
+- name: Open Ports
   firewalld:
     zone: public
     port: "{{ item.port }}/{{ item.proto }}"
     permanent: yes
     immediate: yes
     state: enabled
-  loop: "{{ oracle_ports }}"
+  register: open_ports
+  loop: "{{ _oracle.ports }}"
+- debug: msg={{ open_ports }}
 
-#
-- name: Check if kernel boot parameters are already existed for Oracle Database
+
+- name: Check if Kernel Boot Parameters Already Exists
   lineinfile:
     path: /etc/default/grub
     regexp: '^(GRUB_CMDLINE_LINUX=)(.*)(numa=off transparent_hugepage=never clocksource=tsc.*)(".*)$'
     state: absent
   check_mode: true
   changed_when: false                               # This just makes things look prettier in the logs
-  register: oracle_boot_parameter_existed
+  register: check_oracle_boot_parameter
+- debug: msg={{ check_oracle_boot_parameter }}
 
-#
-- name: Tune boot kernel parameters for Oracle database
+
+- name: Tune Boot Kernel Parameters
   lineinfile:
     path: /etc/default/grub
     regexp: '^(GRUB_CMDLINE_LINUX=)(.*)(".*)$'
     line: '\1\2 {{ item.option }}={{ item.value }}\3'
     state: present
     backrefs: yes
-    # backup: yes
+    backup: yes
+  register: tune_boot_parameter
   with_items:
     - { option: "numa", value: "off" }
     - { option: "transparent_hugepage", value: "never" }
     - { option: "clocksource", value: "tsc" }
-  when: oracle_boot_parameter_existed.found == 0
-# Need to understand the below
-# regexp: '^(GRUB_CMDLINE_LINUX=(?:(?![" ]{{ item.option | regex_escape }}=).)*"?)\s*(?:{{ item.option | regex_escape }}=\S+\s*)?(.*")$'
+  when: check_oracle_boot_parameter.found == 0
+- debug: msg={{ tune_boot_parameter }}
+  # regexp: '^(GRUB_CMDLINE_LINUX=(?:(?![" ]{{ item.option | regex_escape }}=).)*"?)\s*(?:{{ item.option | regex_escape }}=\S+\s*)?(.*")$'
 
-#
-- name: Update grub2 config
-  shell: ( grub2-mkconfig -o /boot/grub2/grub.cfg )
+
+- name: Update GRUB2 Config
+  shell: |
+    grub2-mkconfig -o /boot/grub2/grub.cfg
+  register: update_grup2_config
+- debug: msg={{ update_grup2_config }}
+
+
+- name: Reboot System and Wait for Come Back
+  shell: |
+    echo "Reboot System and Wait for Come Back"
   notify:
-    - Restart system
-    - Waiting for server to come back after reboot
+    - Restart System
+    - Waiting for Server to Come Back after Reboot
+
 
 - meta: flush_handlers
 
-# Need to check why the below is not worked
+
 #- name: Enable development package repository for Oracle Database
 #  become: yes
 #  yum_repository:
@@ -79,8 +98,3 @@
 #    mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=Devel-$releasever
 #    enabled: yes
 
-- name: Install dependent rpm packages to need installing Oracle Database
-  yum:
-    name: "{{ oracle_dep_rpms }}"
-    state: present
-    enablerepo: devel

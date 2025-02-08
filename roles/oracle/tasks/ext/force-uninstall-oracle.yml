@@ -1,0 +1,80 @@
+---
+- name: Remove Ports
+  firewalld:
+    zone: public
+    port: "{{ item.port }}/{{ item.proto }}"
+    permanent: yes
+    immediate: yes
+    state: disabled
+  register: remove_ports
+  ignore_errors: true
+  loop: "{{ _oracle.ports }}"
+- debug: msg={{ remove_ports }}
+
+
+- name: Reload Firewalld
+  shell: |
+    firewall-cmd --reload
+  register: reload_firewalld
+  ignore_errors: true
+- debug: msg={{ reload_firewalld }}
+
+
+- name: Stop and Disable Oracle Database Service
+  import_tasks: ext/stop-oracle.yml
+  ignore_errors: true
+
+
+- name: Remove Oracle Group
+  group:
+    name: "{{ item }}"
+    state: "absent"
+  ignore_errors: true
+  with_items:
+    - "dba"
+    - "oper"
+    - "backupdba"
+    - "dgdba"
+    - "kmdba"
+    - "racdba"
+
+
+- name: Remove Oracle User
+  user:
+    name: "{{ item }}"
+    state: absent
+    remove: yes
+  ignore_errors: true
+  with_items:
+    - "oracle"
+
+
+- name: Delete Oracle Systemd
+  become_user: root
+  file:
+    path: /etc/systemd/system/dbora.service
+    state: absent
+  register: delete_oracle_systemd
+  ignore_errors: true
+  with_items:
+    - "/etc/systemd/system/dbora.service"
+    - "/etc/security/limits.d/30-oracle-limits.conf"
+    - "/etc/sysctl.d/98-oracle-sysctl.conf"
+    - "/u01"
+    - "/u02"
+    - "/etc/oraInst.loc"
+    - "/etc/oratab"
+    - "/opt/ORCLfmap"
+    - "/home/oracle"
+  notify:
+    - Restart System
+    - Waiting for Server to Come Back after Reboot
+
+- meta: flush_handlers
+
+
+- name: Wait 300 Seconds, but Only Start Checking after 10 Seconds
+  wait_for_connection:
+    delay: 10
+    timeout: 300
+

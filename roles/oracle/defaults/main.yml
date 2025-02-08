@@ -1,2 +1,7 @@
 ---
 # defaults file for oracle19c_install
+oracle_dep_rpms: "bc,binutils,compat-openssl10,elfutils-libelf,glibc,glibc-devel,
+ksh,libaio,libXrender,libX11,libXau,libXi,libXtst,libgcc,libnsl,libstdc++,libxcb,
+libibverbs,make,policycoreutils,policycoreutils-python-utils,smartmontools,sysstat,
+libnsl2,libnsl2-devel,net-tools,nfs-utils,unzip,java-1.8.0-openjdk"
+

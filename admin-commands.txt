@@ -1,0 +1,6 @@
+
+## Need to Understand How it can be utilized in tags
+~~~
+tags: "{{ 'always' if 'deploy' in ansible_run_tags or 'install' in ansible_run_tags else ''}}"
+~~~
+

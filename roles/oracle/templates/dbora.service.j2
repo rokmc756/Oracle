@@ -5,9 +5,10 @@ After=network.target
 [Service]
 User=oracle
 Type=forking
-ExecStart={{ oracle_home }}/bin/dbstart {{ oracle_home }}
-ExecStop={{ oracle_home }}/bin/dbshut {{ oracle_home }}
+ExecStart={{ _oracle.home_dir }}/bin/dbstart {{ _oracle.home_dir }}
+ExecStop={{ _oracle.home_dir }}/bin/dbshut {{ _oracle.home_dir }}
 TimeoutSec=300s
 
 [Install]
 WantedBy=multi-user.target
+
