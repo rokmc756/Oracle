@@ -50,9 +50,8 @@
 
 
 - name: Delete Oracle Systemd
-  become_user: root
   file:
-    path: /etc/systemd/system/dbora.service
+    path: "{{ item }}"
     state: absent
   register: delete_oracle_systemd
   ignore_errors: true
@@ -69,6 +68,7 @@
   notify:
     - Restart System
     - Waiting for Server to Come Back after Reboot
+
 
 - meta: flush_handlers
 

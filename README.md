@@ -42,7 +42,7 @@ Configure Yum / Local & EPEL Repostiory
 ```
 $ git clone https://github.com/rokmc756/Oracle
 ```
-#### 2)  Go to oracle directory
+#### 2)  Go to Oracle directory
 ```
 $ cd Oracle
 ```
