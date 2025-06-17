@@ -1,0 +1,94 @@
+---
+- name: Install Administration Tools
+  package:
+    name: "{{ item }}"
+    state: present
+  register: install_admintool
+  with_items:
+    - "targetcli"
+- debug: msg={{ install_admintool }}
+
+
+- name: Creates Directory
+  file:
+    path: "{{ item.base_dir }}"
+    state: directory
+    mode: 0755
+  register: create_dir
+  with_items: "{{ _iscsi.target.disks }}"
+- debug: msg={{ create_dir }}
+
+
+#- name: Create an Target Disks by TargetCLI
+#  shell: |
+#    cat << EOF | targetcli
+#    cd /backstores/fileio
+#    create {{ item.name }} {{ item.base_dir }}/{{ item.name }}.img {{ item.size }}
+#    cd /iscsi
+#    create {{ iscsi_iqn }}:{{ item.group }}.{{ item.name }}
+#    cd {{ iscsi_iqn }}:{{ item.group }}.{{ item.name }}/tpg1/luns
+#    create /backstores/fileio/{{ item.name }}
+#    cd ../acls
+#    create {{ iscsi_iqn }}:{{ item.group }}.{{ item.client }}
+#    cd {{ iscsi_iqn }}:{{ item.group }}.{{ item.client }}
+#    set auth nochap
+#    set attribute generate_node_acls=1
+#    exit
+#    EOF
+#  register: create_target_disks
+#  with_items: "{{ _iscsi.target.disks }}"
+# set auth userid=iscsiadm
+# set auth password=changeme
+
+
+- name: Create an Target Disks by TargetCLI
+  shell: |
+    cat << EOF | targetcli
+    cd /backstores/fileio
+    create {{ item.name }} {{ item.base_dir }}/{{ item.name }}.img {{ item.size }}
+    cd /iscsi
+    create {{ iscsi_iqn }}:{{ item.group }}.{{ item.name }}
+    cd {{ iscsi_iqn }}:{{ item.group }}.{{ item.name }}/tpg1/luns
+    create /backstores/fileio/{{ item.name }}
+    exit
+    EOF
+  register: create_target_disks
+  with_items: "{{ _iscsi.target.disks }}"
+
+
+- name: Create an Target Disks by TargetCLI
+  shell: |
+    cat << EOF | targetcli
+    cd /iscsi
+    cd {{ iscsi_iqn }}:{{ item.group }}.{{ item.name }}/tpg1/luns
+    cd ../acls
+    create {{ iscsi_iqn }}:{{ item.group }}.{{ item.client }}
+    cd {{ iscsi_iqn }}:{{ item.group }}.{{ item.client }}
+    set auth nochap
+    set attribute generate_node_acls=1
+    exit
+    EOF
+  register: create_target_disks
+  with_items: "{{ _iscsi.target.clients }}"
+
+
+- name: Install PolicyCoreUtils Package
+  package:
+    name: "{{ item }}"
+    state: present
+  ignore_errors: yes
+  register: install_policycoreutils
+  with_items:
+    - "policycoreutils-python-utils"
+- debug: msg={{ install_policycoreutils }}
+
+
+- name: Reload and Start Target
+  systemd:
+    daemon_reload: yes
+    name: target
+    enabled: yes
+    state: started
+  register: start_target_service
+- debug: msg={{ start_target_service }}
+

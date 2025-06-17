@@ -2,6 +2,7 @@
 ansible_ssh_pass: changeme
 ansible_become_pass: changeme
 
+
 _oracle:
   cluster_name: jack-kr-oracle
   major_version: "21"
@@ -17,7 +18,7 @@ _oracle:
   repo_url: ""
   download_url: ""
   download: false
-  host_num: "{{ groups['all'] | length }}"
+  # host_num: "{{ groups['all'] | length }}"
   base_path: "/root"
   user:               "oracle"
   password:           "changeme"
@@ -50,18 +51,18 @@ _oracle:
   net:
     type: "virtual"                # Or Physical
     gateway: "192.168.0.1"
-    ipaddr0: "192.168.0.15"
-    ipaddr1: "192.168.1.15"
-    ipaddr2: "192.168.2.15"
+    ipaddr0: "192.168.0.24"
+    ipaddr1: "192.168.1.24"
+    ipaddr2: "192.168.2.24"
   client:
     net:
       type: "virtual"              # Or Physical
       cores: 1
-      ipaddr0: "192.168.0.15"
-      ipaddr1: "192.168.1.15"
-      ipaddr2: "192.168.2.15"
+      ipaddr0: "192.168.0.24"
+      ipaddr1: "192.168.1.24"
+      ipaddr2: "192.168.2.24"
   vms:
-    rk9: [ "rk8-oracle", "rk9-freeipa" ]
+    rk9: [ "rk9-freeipa", "rk8-oracle01", "rk8-oracle02", "rk8-oracle03", "rk94-node00", "rk94-node99" ]
     ubt24: [ "ubt24-oracle", "rk9-freeipa" ]
   debug_opt: ""  # --debug
 
@@ -95,4 +96,5 @@ kvm:
   hostname: "192.168.0.101"
   username: "root"
   password: "changeme"
+
 

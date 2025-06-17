@@ -1,9 +1,8 @@
-for i in `seq 3 3`
+for i in `echo 1 3 8 9`
 do
 
-    nc -vz 192.168.2.15$i 22
-    # ssh-keyscan 192.168.2.18$i
-    ssh-keyscan 192.168.2.15$i >/dev/null 2>&1
+    nc -vz 192.168.2.24$i 22
+    ssh-keyscan 192.168.2.24$i >/dev/null 2>&1
 
 done
 

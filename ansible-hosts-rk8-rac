@@ -1,0 +1,16 @@
+[all:vars]
+ssh_key_filename="id_rsa"
+remote_machine_username="jomoon"
+remote_machine_password="changeme"
+
+
+[iscsi]
+rk94-node00 ansible_ssh_host=192.168.2.248 ansible_ssh_host1=192.168.0.248
+rk94-node99 ansible_ssh_host=192.168.2.249 ansible_ssh_host1=192.168.0.249
+
+
+[databases]
+rk8-oracle01 ansible_ssh_host=192.168.2.241
+rk8-oracle02 ansible_ssh_host=192.168.2.242
+rk8-oracle03 ansible_ssh_host=192.168.2.243
+

@@ -7,6 +7,5 @@
         virsh {{ power_state }} {{ item }}
       register: power_vms
       ignore_errors: true
-      loop: "{{ oracle.vms.rk9 }}"
-      # loop: "{{ oracle.vms.ubt24 }}"
+      loop: "{{ _oracle.vms.rk9 }}"
 

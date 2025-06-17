@@ -3,11 +3,11 @@
   lineinfile:
     dest: /etc/hosts
     regexp: "{{ domain_name }}"
-    line: "{{ hostvars[ item ][ _netdev ][ 'ipv4' ][ 'address' ] }} {{ item }}"
+    line: "{{ _ipaddr }}"
     state: absent
     backup: yes
   register: hosts_deleted
-  when: hostvars[ item ][ _netdev ]['ipv4']['address'] is defined
+  when: _ipaddr is defined
   with_items: "{{ groups['all'] }}"
 
 

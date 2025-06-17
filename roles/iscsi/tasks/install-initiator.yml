@@ -1,0 +1,27 @@
+---
+- name: Install iSCSI Initiator
+  package:
+    name: iscsi-initiator-utils
+    state: present
+  register: install_iscsi_initiator
+
+
+- name: Copy iSCSId Config Files
+  template: src=iscsid.conf.j2 dest=/etc/iscsi/iscsid.conf owner=root group=root mode=644 force=yes
+  register: copy_iscsid_conf
+
+
+- name: Configure First iSCSI Initiator
+  import_tasks: config-first-initiator.yml
+
+
+#- name: Configure Second iSCSI Initiator
+#  import_tasks: config-second-initiator.yml
+
+
+- name: Check the Device Name Attached
+  shell: |
+    iscsiadm -m session -P 3 | grep 'Target\|disk' | grep Attached | awk '{print $4}'
+  register: attach_device_name
+# command: cat /proc/partitions
+

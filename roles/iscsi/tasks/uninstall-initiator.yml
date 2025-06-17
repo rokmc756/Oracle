@@ -1,0 +1,58 @@
+---
+- name: Check the Device Name Attached
+  shell: |
+    iscsiadm -m session -P 3 | grep 'Target\|disk' | grep Attached | awk '{print $4}'
+  register: attach_device_name
+  ignore_errors: true
+
+
+- name: Confirm the Established Session
+  shell: |
+    iscsiadm -m session -o show
+  register: confirm_established_session
+  ignore_errors: true
+
+
+#- name: Delete Second iSCSI Initiator
+#  import_tasks: delete-second-initiator.yml
+
+
+- name: Delete First iSCSI Initiator
+  import_tasks: delete-first-initiator.yml
+
+
+- name: Stop and Disable iSCSId
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+  register: stop_iscsid
+  ignore_errors: true
+  until: stop_iscsid is succeeded
+  retries: 3
+  delay: 10
+  with_items:
+    - "iscsid"
+
+
+- name: Delete Config Files of iSCSI Initiator
+  file:
+    path: "{{ item }}"
+    state: absent
+  register: delete_iscsi_initator_config_files
+  ignore_errors: true
+  with_items:
+    - "/etc/iscsi/iscsid.conf"
+    - "/etc/iscsi/initiatorname.iscsi"
+    - "/etc/iscsi/nodes"
+    - "/etc/iscsi/send_targets"
+    - "/var/lib/iscsi/nodes"
+    - "/var/lib/iscsi/send_targets"
+
+
+- name: Uninstall iSCSI Initiator
+  package:
+    name: iscsi-initiator-utils
+    state: absent
+  register: uninstall_iscsi_initiator
+  ignore_errors: true
+

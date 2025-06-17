@@ -184,5 +184,5 @@ $ make oracle r=stop s=db
 - [ ] Deinstall Not Working Currently
 - [ ] Need Imporovement to Create Multi Tenant Databases -  https://mikedietrichde.com/2018/11/13/how-to-speed-up-multitenant-custom-database-creation/
 - [ ] ADD Upgrade
-- [ ] Consider playbook to add RAC referring to this link - https://github.com/oravirt/ansible-oracle
+- [ ] Consider playbook to add RAC referring to this link - https://github.com/oravirt/ansible-oracle, http://www.koreaoug.org/install/9222
 

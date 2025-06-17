@@ -1,40 +1,99 @@
-USERNAME=jomoon
+#USERNAME=jomoon
+#COMMON="yes"
+#ANSIBLE_HOST_PASS="changeme"
+#ANSIBLE_TARGET_PASS="changeme"
+#
+#
+## Define Boot CMD
+#VMWARE_BOOT_CMD="power-on"
+#VMWARE_SHUTDOWN_CMD="shutdown-guest"
+#VMWARE_ROLE_CONFIG="control-vms-vmware.yml"
+#KVM_BOOT_CMD="start"
+#KVM_SHUTDOWN_CMD="shutdown"
+#KVM_ROLE_CONFIG="control-vms-kvm.yml"
+#KVM_HOST_CONFIG="ansible-hosts-fedora"
+#VMWARE_HOST_CONFIG="ansible-hosts-vmware"
+#
+#BOOT_CMD=${KVM_BOOT_CMD}
+#SHUTDOWN_CMD=${KVM_SHUTDOWN_CMD}
+#ROLE_CONFIG=${KVM_ROLE_CONFIG}
+#ANSIBLE_HOST_CONFIG=${KVM_HOST_CONFIG}
+
+
+## Control VMs in KVM For Power On or Off
+#boot:
+#	ansible-playbook -i ${ANSIBLE_HOST_CONFIG} --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -u ${USERNAME} ${ROLE_CONFIG} --extra-vars "power_state=${BOOT_CMD} power_title=Power-On VMs"
+
+#shutdown:
+#	ansible-playbook -i ${ANSIBLE_HOST_CONFIG} --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -u ${USERNAME} ${ROLE_CONFIG} --extra-vars "power_state=${SHUTDOWN_CMD} power_title=Shutdown VMs"
+
+
+USERNAME="jomoon"
 COMMON="yes"
 ANSIBLE_HOST_PASS="changeme"
 ANSIBLE_TARGET_PASS="changeme"
 
+VIRT_ENV=KVM
 
-# Define Boot CMD
-VMWARE_BOOT_CMD="power-on"
-VMWARE_SHUTDOWN_CMD="shutdown-guest"
-VMWARE_ROLE_CONFIG="control-vms-vmware.yml"
-KVM_BOOT_CMD="start"
-KVM_SHUTDOWN_CMD="shutdown"
-KVM_ROLE_CONFIG="control-vms-kvm.yml"
-KVM_HOST_CONFIG="ansible-hosts-fedora"
-VMWARE_HOST_CONFIG="ansible-hosts-vmware"
+ifeq ($(VIRT_ENV),VMware)
+        BOOT_CMD="powered-on"
+        SHUTDOWN_CMD="shutdown-guest"
+        ROLE_CONFIG="control-vms-vmware.yml"
+        ANSIBLE_HOST_CONFIG="ansible-hosts-vmware"
+else ifeq ($(VIRT_ENV),KVM)
+        BOOT_CMD="start"
+        SHUTDOWN_CMD="shutdown"
+        ROLE_CONFIG="control-vms-kvm.yml"
+        ANSIBLE_HOST_CONFIG="ansible-hosts-fedora"
+else
+        VIRT_ENV=
+endif
 
-BOOT_CMD=${KVM_BOOT_CMD}
-SHUTDOWN_CMD=${KVM_SHUTDOWN_CMD}
-ROLE_CONFIG=${KVM_ROLE_CONFIG}
-ANSIBLE_HOST_CONFIG=${KVM_HOST_CONFIG}
 
-
-# Control VMs in KVM For Power On or Off
 boot:
-	ansible-playbook -i ${ANSIBLE_HOST_CONFIG} --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -u ${USERNAME} ${ROLE_CONFIG} --extra-vars "power_state=${BOOT_CMD} power_title=Power-On VMs"
+	@if [ -z ${VIRT_ENV} ]; then echo "Not Supported Virtualization"; exit 1; fi
+	@ansible-playbook -i ${ANSIBLE_HOST_CONFIG} --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -u ${USERNAME} ${ROLE_CONFIG} --extra-vars "power_state=${BOOT_CMD} power_title=Power-On VMs"
 
 shutdown:
-	ansible-playbook -i ${ANSIBLE_HOST_CONFIG} --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -u ${USERNAME} ${ROLE_CONFIG} --extra-vars "power_state=${SHUTDOWN_CMD} power_title=Shutdown VMs"
+	@if [ -z ${VIRT_ENV} ]; then echo "Not Supported Virtualization"; exit 1; fi
+	@ansible-playbook -i ${ANSIBLE_HOST_CONFIG} --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -u ${USERNAME} ${ROLE_CONFIG} --extra-vars "power_state=${SHUTDOWN_CMD} power_title=Shutdown VMs"
+
+download:
+	@if [ -z ${VIRT_ENV} ]; then echo "Not Supported Virtualization"; exit 1; fi
+	@ansible-playbook --ssh-common-args='-o UserKnownHostsFile=./known_hosts' -u ${USERNAME} download-hadoop.yml --tags="download"
 
 
 # For All Roles
 %:
-	@ln -sf ansible-hosts-rk8-single-db ansible-hosts;
+	@if [ -z ${VIRT_ENV} ]; then echo "Not Supported Virtualization"; exit 1; fi
+	@cat setup-temp.yml.tmp | sed -e 's/temp/${*}/g' > setup-${*}.yml;
+
+	@if [ "${*}" = "hosts" ]; then\
+		ln -sf ansible-hosts-rk8 ansible-hosts;\
+	elif [ "${*}" = "oracle" ]; then\
+		ln -sf ansible-hosts-rk8-single ansible-hosts;\
+	elif [ "${*}" = "rac" ]; then\
+		ln -sf ansible-hosts-rk8-rac ansible-hosts;\
+	elif [ "${*}" = "iscsi" ]; then\
+		ln -sf ansible-hosts-rk8 ansible-hosts;\
+	else\
+		echo "No actions to temp";\
+		exit;\
+	fi
 	@cat Makefile.tmp  | sed -e 's/temp/${*}/g' > Makefile.${*}
-	@cat setup-temp.yml.tmp | sed -e 's/    - temp/    - ${*}/g' > setup-${*}.yml
 	@make -f Makefile.${*} r=${r} s=${s} c=${c} USERNAME=${USERNAME}
 	@rm -f setup-${*}.yml Makefile.${*}
+
+
+# For All Roles
+#%:
+#	@ln -sf ansible-hosts-rk8-oracle ansible-hosts;
+#	@cat Makefile.tmp  | sed -e 's/temp/${*}/g' > Makefile.${*}
+#	@cat setup-temp.yml.tmp | sed -e 's/    - temp/    - ${*}/g' > setup-${*}.yml
+#	@make -f Makefile.${*} r=${r} s=${s} c=${c} USERNAME=${USERNAME}
+#	@rm -f setup-${*}.yml Makefile.${*}
+
+
 
 
 # clean:
@@ -50,3 +109,4 @@ shutdown:
 
 # Need to check what it should be needed
 .PHONY:	all init install update ssh common clean no_targets__ role-update
+
