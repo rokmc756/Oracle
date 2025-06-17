@@ -1,0 +1,48 @@
+---
+- name: Stop Oracle Listener
+  become_user: "{{ _oracle.user }}"
+  shell: |
+    {{ _oracle.home_dir }}/bin/lsnrctl stop
+  register: stop_oracle_listener
+- debug: msg={{ stop_oracle_listener }}
+
+
+- name: Check Deinstall Silently
+  become_user: "{{ _oracle.user }}"
+  shell: |
+    {{ _oracle.home_dir }}/deinstall/deinstall -silent -checkonly
+  register: deinstall_oracle_checkonly
+  ignore_errors: true
+
+
+- name: Set Fact for the RSP Locatino File
+  set_fact:
+    rsp_location: "{{ ( deinstall_oracle_checkonly.stdout_lines | select('search', 'deinstall_OraDB' ) | list | string | split(' '))[5] | regex_replace(\"'\", '') | regex_replace(']', '') | regex_replace('\"', '') }}"
+- debug: msg={{ rsp_location }}
+# stdout[1:-1] --> Remove first and last character in a line
+
+
+- name: Deinstall ORACLE_HOME
+  become_user: "{{ _oracle.user }}"
+  shell: |
+    {{ _oracle.home_dir }}/deinstall/deinstall -silent -local -paramfile {{ rsp_location }}
+  register: deinstall_oracle_home
+  ignore_errors: true
+- debug: msg={{ deinstall_oracle_home }}
+
+
+- name: Delete Oratab, OraInst.loc and ORCLfmap to Cleanup Oracle Installer
+  become_user: "{{ _oracle.root_user }}"
+  file:
+    path: "{{ item }}"
+    state: absent
+  register: cleanup_oracle_installer
+  ignore_errors: true
+  with_items:
+    - "/etc/oraInst.loc"
+    - "/etc/oratab"
+    - "/opt/ORCLfmap"
+#    - "/u01"
+#    - "/u02"
+- debug: msg={{ cleanup_oracle_installer }}
+

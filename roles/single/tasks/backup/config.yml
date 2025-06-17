@@ -1,0 +1,146 @@
+#
+- name: Start Oracle Listener
+  become_user: "{{ oracle_user }}"
+  shell: "{{ oracle_home }}/bin/lsnrctl start"
+  register: oracle_listener_started
+  ignore_errors: true
+
+#
+- debug: msg={{ oracle_listener_started }}
+
+#
+- name: Copy template of script to create oracle multi-tenant database
+  become_user: "{{ oracle_user }}"
+  template: src={{ item.fn }}.j2 dest={{ item.copy_dir }}/{{ item.fn }} owner=oracle group=oinstall mode=0755 force=yes
+  register: script_multi_tenant_db_copied
+  with_items:
+    - { fn: "create-multi-tenant-db.sh", copy_dir: "{{ oracle_home }}" }
+
+- debug: msg={{ script_multi_tenant_db_copied }}
+
+#
+- name: Create and Oracle multi-tenant database
+  become_user: "{{ oracle_user }}"
+  shell: "{{ oracle_home }}/create-multi-tenant-db.sh"
+  ignore_errors: true
+  async: 1200
+  poll: 5
+  register: oracle_multi_tenant_db_created
+
+- debug: msg={{ oracle_multi_tenant_db_created }}
+
+#
+- name: Enable autostart of Oracle database instances
+  become_user: "{{ root_user }}"
+  shell: ( sed -i 's/:N$/:Y/g' /etc/oratab )
+  register: oratab_modfiled
+
+- debug: msg={{ oratab_modfiled }}
+
+#
+- name: Copy template of query files
+  become_user: "{{ oracle_user }}"
+  template: src={{ item.fn }}.j2 dest={{ item.copy_dir }}/{{ item.fn }} owner=oracle group=oinstall mode=0644 force=yes
+  register: query_files_template_copied
+  with_items:
+    - { fn: "change-password-system.sql", copy_dir: "{{ oracle_home }}" }
+    - { fn: "enable-omf-autostart.sql", copy_dir: "{{ oracle_home }}" }
+    - { fn: "grant-all-priv-oracleuser.sql", copy_dir: "{{ oracle_home }}" }
+    - { fn: "create-oracleuser.sql", copy_dir: "{{ oracle_home }}" }
+    - { fn: "create-user-table.sql", copy_dir: "{{ oracle_home }}" }
+
+- debug: msg={{ query_files_template_copied }}
+
+#
+- name: Enable Oracle Managed File (OMF) and autostart of Pluggable database with the startup of Container Database
+  become_user: "{{ oracle_user }}"
+  shell: "source ~/.bashrc && {{ oracle_home }}/bin/sqlplus '/ as sysdba' @{{ oracle_home }}/enable-omf-autostart.sql"
+  register: omf_autostart_enabled
+
+  # sqlplus -S dbuser/dbpasswd@dbsid @scriptname </dev/null
+
+- debug: msg={{ omf_autostart_enabled }}
+
+#
+- name: Copy systemd configuration of oracle into /etc/systemd/system
+  template: src=dbora.service.j2 dest=/etc/systemd/system/dbora.service owner=root group=root mode=644 force=yes
+  register: dbora_systemd_config_copied
+
+- debug: msg={{ dbora_systemd_config_copied }}
+
+#
+- name: Enable,Reload and Start Oracle Database through systemd
+  become_user: "{{ root_user }}"
+  systemd:
+    daemon_reload: yes
+    name: dbora
+    enabled: yes
+    state: started
+  register: dbora_systemd_started
+
+- debug: msg={{ dbora_systemd_started }}
+
+#
+- name: Change password of internal admin users, sys and system
+  become_user: "{{ oracle_user }}"
+  shell: "source ~/.bashrc && {{ oracle_home }}/bin/sqlplus '/ as sysdba' @{{ oracle_home }}/change-password-system.sql"
+  register: password_sys_system_changed
+
+- debug: msg={{ password_sys_system_changed }}
+
+
+#
+- name: Create oracle user with password and grant privileges / Check connections by sys and system user
+  become_user: "{{ oracle_user }}"
+  shell: "source ~/.bashrc && {{ oracle_home }}/bin/sqlplus system/changeme @{{ oracle_home }}/create-oracleuser.sql"
+  register: oracle_user_created
+
+- debug: msg={{ oracle_user_created }}
+
+#
+- name: Connect with oracleuser user and create table, insert data
+  become_user: "{{ oracle_user }}"
+  shell: "source ~/.bashrc && {{ oracle_home }}/bin/sqlplus oracleuser/changeme @{{ oracle_home }}/create-user-table.sql"
+  register: oracle_user_connected
+
+- debug: msg={{ oracle_user_connected }}
+
+#
+- name: Copy template of CMAN, Listener and Tnsnames for remote connection
+  become_user: "{{ oracle_user }}"
+  template: src={{ item.fn }}.j2 dest={{ item.copy_dir }}/{{ item.fn }} owner=oracle group=oinstall mode=0644 force=yes
+  register: remote_connection_templates_copied
+  with_items:
+    - { fn: "cman.ora", copy_dir: "{{ oracle_home }}/network/admin" }
+    - { fn: "listener.ora", copy_dir: "{{ oracle_home }}/network/admin" }
+    - { fn: "tnsnames.ora", copy_dir: "{{ oracle_home }}/network/admin" }
+
+- debug: msg={{ remote_connection_templates_copied }}
+
+#
+- name: Restart Oracle Database through systemd
+  become_user: "{{ root_user }}"
+  systemd:
+    name: dbora
+    state: restarted
+  register: dbora_systemd_restarted
+
+- debug: msg={{ dbora_systemd_restarted }}
+
+#
+- name: Check if remote connection is working by using sqlplus command
+  become_user: "{{ oracle_user }}"
+  shell: "source ~/.bashrc && echo 'select 1 from dual;' | {{ oracle_home }}/bin/sqlplus oracleuser/changeme"
+  register: remote_connection_checked
+  # shell: "source ~/.bashrc && {{ oracle_home }}/bin/sqlplus oracleuser/changeme@cdb1"
+
+#
+- debug: msg={{ remote_connection_checked }}
+
+#
+- name: Grant all privileges to oracleuser
+  become_user: "{{ oracle_user }}"
+  shell: "source ~/.bashrc && {{ oracle_home }}/bin/sqlplus '/ as sysdba' @{{ oracle_home }}/grant-all-priv-oracleuser.sql"
+  register: all_privileges_oracleuser_granted
+
+- debug: msg={{ all_privileges_oracleuser_granted }}

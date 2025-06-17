@@ -139,23 +139,23 @@ $ vi setup-temp.yml.tmp
 ```
 #### 9) Install Oracle Database at Once or Seperately
 ```
-$ make oracle r=prepare s=os
-$ make oracle r=setup s=pkgs
-$ make oracle r=create s=swap
-$ make oracle r=prepare s=db
-$ make oracle r=setup s=db
-$ make oracle r=config s=ora
-$ make oracle r=deploy s=db
-$ make oracle r=config s=db
-$ make oracle r=create s=db
-$ make oracle r=remove s=ora
-$ make oracle r=copy s=examples
-$ make oracle r=enable s=omf
-$ make oracle r=create s=users
-$ make oracle r=enable s=remote
+$ make single r=prepare s=os
+$ make single r=setup s=pkgs
+$ make single r=create s=swap
+$ make single r=prepare s=db
+$ make single r=setup s=db
+$ make single r=config s=ora
+$ make single r=deploy s=db
+$ make single r=config s=db
+$ make single r=create s=db
+$ make single r=remove s=ora
+$ make single r=copy s=examples
+$ make single r=enable s=omf
+$ make single r=create s=users
+$ make single r=enable s=remote
 
 or
-$ make oracle r=install s=all
+$ make single r=install s=all
 ```
 #### 10) Run the following script To uninstall oracle after modifying your user and hostname
 ```
@@ -163,19 +163,19 @@ $ make oracle r=delete s=force
 ```
 #### 11) Run make deinstall if you just want to destroy oracle software only deployed at $ORACLE_HOME directory.
 ```
-$ make oracle r=deinstall s=db
-$ make oracle r=disable s=swap
+$ make single r=deinstall s=db
+$ make single r=disable s=swap
 
 or
-$ make oracle r=uninstall s=all (X)
+$ make single r=uninstall s=all (X)
 ```
 
 
 #### 12) Start and Stop Oracle Database Service
 
 ```
-$ make oracle r=start s=db
-$ make oracle r=stop s=db
+$ make single r=start s=db
+$ make single r=stop s=db
 ```
 
 

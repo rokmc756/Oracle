@@ -1,0 +1,63 @@
+---
+
+# Install Oracle Database
+
+# for now fail if it's not a Red Hat based system
+- name: Check OS ( Oracle )
+  fail: msg="Not a Red Hat based system!"
+  when: ansible_os_family != 'RedHat' or ansible_os_family != 'CentOS' or ansible_os_family != 'Rocky'
+
+- name: Prepare OS Environment for Oracle on Red Hat / CentOS
+  include: 01-prepare-os.yml
+  tags:
+    - "{{ 'always' if 'prepare' in ansible_run_tags or 'install' in ansible_run_tags else ''}}"
+    - prepare
+    - install
+
+- name: Prepare Oracle Environment for Oracle on Red Hat / CentOS
+  include: 02-prepare-oracle.yml
+  tags:
+    - "{{ 'always' if 'prepare' in ansible_run_tags or 'install' in ansible_run_tags else ''}}"
+    - prepare
+    - install
+
+#
+- name: Deploy Oracle Binary on Red Hat / CentOS
+  include: 03-deploy-oracle-bin.yml
+  tags:
+    - "{{ 'always' if 'deploy' in ansible_run_tags or 'install' in ansible_run_tags else ''}}"
+    - deploy
+    - install
+
+#
+- name: Setup Oracle Database on Red Hat / CentOS
+  include: 04-setup-oracle.yml
+  tags:
+    - "{{ 'always' if 'setup' in ansible_run_tags or 'install' in ansible_run_tags else ''}}"
+    - setup
+    - install
+
+
+#
+- name: Configure Oracle on Red Hat / CentOS
+  include: 05-config-oracle.yml
+  tags:
+    - "{{ 'always' if 'config' in ansible_run_tags or 'install' in ansible_run_tags else ''}}"
+    - config
+    - install
+
+#
+- name: Deinstall Oracle DB on Red Hat / CentOS
+  include: 06-deinstall-oracle.yml
+  tags:
+    - deinstall
+
+#
+- name: Uninstall Oracle on Red Hat / CentOS
+  include: uninstall.yml
+  tags: uninstall
+
+#
+- name: Upgrade Oracle on Red Hat / CentOS
+  include: upgrade.yml
+  tags: upgrade

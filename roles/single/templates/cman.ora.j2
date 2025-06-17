@@ -1,0 +1,4 @@
+(ADDRESS=(PROTOCOL=tcp)(HOST={{ hostvars[inventory_hostname][_netdev]['ipv4']['address'] }})(PORT=1521))
+(RULE_LIST=
+  (RULE=(SRC=*)(DST={{ hostvars[inventory_hostname][_netdev]['ipv4']['address'] }})(SRV=FRADB)(ACT=accept))
+  (rule=(src={{ hostvars[inventory_hostname][_netdev]['ipv4']['network'] }}/24)(dst=127.0.0.1)(srv=cmon)(act=accept))))

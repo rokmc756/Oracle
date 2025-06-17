@@ -1,0 +1,23 @@
+---
+- name: Check if Oracle Database Software Already Exists
+  stat: path=/home/oracle/{{ _oracle.binary }}
+  register: check_oracle_bin
+
+
+- name: Copy Oracle Database Software from Source to Target Host
+  copy: src={{ _oracle.binary }} dest=/home/oracle mode=0777
+  when: check_oracle_bin.stat.exists != True
+
+
+- name: Check if Any Version of Oracle Database is Already Unpacked
+  stat: path=/u01/app/oracle/product/{{ oracle_version }}/dbhome_1
+  register: check_oracle_unpacked
+
+
+- name: Unpack Oracle Database Software to the Target Host
+  unarchive:
+    src: /home/oracle/{{ _oracle.binary }}
+    dest: /u01/app/oracle/product/{{ oracle_version }}/dbhome_1
+    remote_src: yes
+  # when: check_oracle_unpacked.stat.exists != True
+

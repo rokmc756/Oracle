@@ -1,0 +1,29 @@
+---
+# Improve Performance to Create Tenant Databases - https://mikedietrichde.com/2018/11/13/how-to-speed-up-multitenant-custom-database-creation/
+
+- name: Increase Shared Pool Size
+  become_user: root
+  lineinfile:
+    dest: "/u01/app/oracle/product/{{ oracle_version }}/dbhome_1/srvm/admin/init.ora"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: "{{ item.state }}"
+  register: increase_shared_pool_sixe
+  with_items:
+    - { regexp: '^ shared_pool_size =*', line: ' shared_pool_size = 100663296', state: present }
+  # 67108864 * 1.5 = 100663296
+
+
+- name: Tune Heap and Cursor Threshold
+  become_user: root
+  lineinfile:
+    dest: "{{ item.dest }}"
+    line: '{{ item.line }}'
+  with_items:
+    - { dest: "/u01/app/oracle/product/{{ oracle_version }}/dbhome_1/dbs/init.ora",        line: "_kgl_large_heap_assert_threshold=1524288000" }
+    - { dest: "/u01/app/oracle/product/{{ oracle_version }}/dbhome_1/dbs/init.ora",        line: "_kgl_large_heap_warning_threshold=1524288000" }
+    - { dest: "/u01/app/oracle/product/{{ oracle_version }}/dbhome_1/dbs/init.ora",        line: "_cursor_obsolete_threshold=1024" }
+    - { dest: "/u01/app/oracle/product/{{ oracle_version }}/dbhome_1/srvm/admin/init.ora", line: "_kgl_large_heap_assert_threshold=1524288000" }
+    - { dest: "/u01/app/oracle/product/{{ oracle_version }}/dbhome_1/srvm/admin/init.ora", line: "_kgl_large_heap_warning_threshold=1524288000" }
+    - { dest: "/u01/app/oracle/product/{{ oracle_version }}/dbhome_1/srvm/admin/init.ora", line: "_cursor_obsolete_threshold=1024" }
+

@@ -1,0 +1,15 @@
+---
+- name: Wait 300 Seconds, but Only Start Checking after 10 Seconds
+  wait_for_connection:
+    delay: 10
+    timeout: 300
+
+
+- name: Install Dependent Packages
+  package:
+    name: "{{ oracle_dep_rpms }}"
+    state: present
+    enablerepo: devel
+  register: install_deps_pkgs
+- debug: msg={{ install_deps_pkgs }}
+
