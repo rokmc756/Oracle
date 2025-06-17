@@ -21,6 +21,8 @@ _oracle:
   # host_num: "{{ groups['all'] | length }}"
   base_path: "/root"
   user:               "oracle"
+  uid:                "1000"
+  gid:                "1001"
   password:           "changeme"
   root_user:          "root"
   mount_directory:    "/"
@@ -36,13 +38,24 @@ _oracle:
   rsp:                "Oracle_EE_SoftOnly"
   binary:             "LINUX.X64_193000_db_home.zip"  #  "LINUX.X64_213000_db_home.zip"
   install_group:
-    - { group: "oinstall",  gid: "1501" }
-    - { group: "dba",       gid: "1502" }
-    - { group: "oper",      gid: "1503" }
-    - { group: "backupdba", gid: "1504" }
-    - { group: "dgdba",     gid: "1505" }
-    - { group: "kmdba",     gid: "1506" }
-    - { group: "racdba",    gid: "1507" }
+    - { group: "oinstall",  gid: "1001" }
+    - { group: "dba",       gid: "1002" }
+    - { group: "oper",      gid: "1003" }
+    - { group: "backupdba", gid: "1004" }
+    - { group: "dgdba",     gid: "1005" }
+    - { group: "kmdba",     gid: "1006" }
+    - { group: "racdba",    gid: "1007" }
+    - { group: "asmdba",    gid: "1008" }
+    - { group: "asmadmin",  gid: "1009" }
+    - { group: "asmoper",   gid: "1010" }
+  #install_group:
+  #  - { group: "oinstall",  gid: "1501" }
+  #  - { group: "dba",       gid: "1502" }
+  #  - { group: "oper",      gid: "1503" }
+  #  - { group: "backupdba", gid: "1504" }
+  #  - { group: "dgdba",     gid: "1505" }
+  #  - { group: "kmdba",     gid: "1506" }
+  #  - { group: "racdba",    gid: "1507" }
   ports:
     - { proto: "tcp",       port: "1521" }
     - { proto: "tcp",       port: "5500" }

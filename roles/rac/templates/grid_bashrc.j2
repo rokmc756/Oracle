@@ -1,0 +1,41 @@
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+# User specific environment
+if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
+then
+    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+fi
+export PATH
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+
+
+# Oracle Settings
+stty erase ^H
+umask 022
+ORACLE_SID=+{{ asm_id }}
+ORACLE_BASE=/u01/app/grid
+ORACLE_HOME=/u01/app/{{ oracle_version }}/grid
+LD_LIBRARY_PATH=$ORACLE_HOME/lib
+TMP=/tmp
+TMPDIR=/tmp
+PATH=$PATH:$HOME/.local/bin:$HOME/bin:$ORACLE_HOME/bin
+export PATH ORACLE_SID ORACLE_BASE ORACLE_HOME LD_LIBRARY_PATH TMP TMPDIR
+export CV_ASSUME_DISTID=OEL8.1 #for Linux 8 ver
+export ORA_DISABLED_CVU_CHECKS="TASKNTP,TASKCTSSINTEGRITY" #for ntp error solution
+ 
+#export SQLPATH=
+export PS1=`hostname`'@$LOGNAME:$ORACLE_SID:$PWD> '
+ 
+alias sqlss='sqlplus / as sysdba'
+alias ob="cd ${ORACLE_BASE}"
+alias oh="cd ${ORACLE_HOME}"
+
