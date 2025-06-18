@@ -19,28 +19,6 @@
 - debug: msg={{ create_dir }}
 
 
-#- name: Create an Target Disks by TargetCLI
-#  shell: |
-#    cat << EOF | targetcli
-#    cd /backstores/fileio
-#    create {{ item.name }} {{ item.base_dir }}/{{ item.name }}.img {{ item.size }}
-#    cd /iscsi
-#    create {{ iscsi_iqn }}:{{ item.group }}.{{ item.name }}
-#    cd {{ iscsi_iqn }}:{{ item.group }}.{{ item.name }}/tpg1/luns
-#    create /backstores/fileio/{{ item.name }}
-#    cd ../acls
-#    create {{ iscsi_iqn }}:{{ item.group }}.{{ item.client }}
-#    cd {{ iscsi_iqn }}:{{ item.group }}.{{ item.client }}
-#    set auth nochap
-#    set attribute generate_node_acls=1
-#    exit
-#    EOF
-#  register: create_target_disks
-#  with_items: "{{ _iscsi.target.disks }}"
-# set auth userid=iscsiadm
-# set auth password=changeme
-
-
 - name: Create an Target Disks by TargetCLI
   shell: |
     cat << EOF | targetcli

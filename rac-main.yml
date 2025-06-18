@@ -1,0 +1,26 @@
+---
+_iscsi:
+  target:
+    iqn01: "iqn.2025-04.com.ddn.jtest01"
+    iqn02: "iqn.2025-04.com.ddn.jtest02"
+    user: "iscsiadm"
+    password: "changeme"
+    os_version: "rk9"
+    disks:
+      - { name: "jtest-vdisk011", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "mgt11", iscsi_dev: "sda" }
+      - { name: "jtest-vdisk012", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "mgt12", iscsi_dev: "sdb" }
+      - { name: "jtest-vdisk013", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "mgt13", iscsi_dev: "sdc" }
+      - { name: "jtest-vdisk014", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "mgt14", iscsi_dev: "sdd" }
+      - { name: "jtest-vdisk015", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "mgt15", iscsi_dev: "sde" }
+    clients:
+      - { name: "jtest-vdisk011", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "dt111", iscsi_dev: "sda", client: "rk8-oracle02" }
+      - { name: "jtest-vdisk021", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "dt121", iscsi_dev: "sda", client: "rk8-oracle03" }
+      - { name: "jtest-vdisk012", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "dt112", iscsi_dev: "sdb", client: "rk8-oracle02" }
+      - { name: "jtest-vdisk022", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "dt122", iscsi_dev: "sdb", client: "rk8-oracle03" }
+      - { name: "jtest-vdisk013", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "dt113", iscsi_dev: "sdc", client: "rk8-oracle02" }
+      - { name: "jtest-vdisk023", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "dt123", iscsi_dev: "sdc", client: "rk8-oracle03" }
+      - { name: "jtest-vdisk014", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "dt114", iscsi_dev: "sdd", client: "rk8-oracle02" }
+      - { name: "jtest-vdisk024", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "dt124", iscsi_dev: "sdd", client: "rk8-oracle03" }
+      - { name: "jtest-vdisk015", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "dt115", iscsi_dev: "sde", client: "rk8-oracle02" }
+      - { name: "jtest-vdisk025", base_dir: "/vdisk/iscsi01", size: "20G", group: "dt1", mp_alias: "dt125", iscsi_dev: "sde", client: "rk8-oracle03" }
+

@@ -34,25 +34,25 @@
 - name: Install iSCSI Initiator
   import_tasks: install-initiator.yml
   tags: setup, create, install
-  when: (( initiator is defined and initiator == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['cluster']
+  when: (( initiator is defined and initiator == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
 
 
-- name: Enable Multipath
-  import_tasks: mp/enable-multipath.yml
-  tags: enable, setup, install
-  when: (( multipath is defined and multipath == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['cluster']
+#- name: Enable Multipath
+#  import_tasks: mp/enable-multipath.yml
+#  tags: enable, setup, install
+#  when: (( multipath is defined and multipath == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
 
 
-- name: Disable Multipath
-  import_tasks: mp/disable-multipath.yml
-  tags: disable, remove, uninstall
-  when: (( multipath is defined and multipath == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['cluster']
+#- name: Disable Multipath
+#  import_tasks: mp/disable-multipath.yml
+#  tags: disable, remove, uninstall
+#  when: (( multipath is defined and multipath == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
 
 
 - name: Uninstall iSCSI Initiator
   import_tasks: uninstall-initiator.yml
   tags: remove, delete, uninstall
-  when: (( initiator is defined and initiator == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['cluster']
+  when: (( initiator is defined and initiator == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
 
 
 - name: Uninstall iSCSI Target In Less Version Than RHEL/Rocky/CentOS 8.x

@@ -4,7 +4,7 @@
     init_iqn: "{{ _iscsi.target.iqn01 }}"
   template: src=initiatorname.iscsi.j2 dest=/etc/iscsi/initiatorname.iscsi owner=root group=root mode=644 force=yes
   register: copy_initiatorname
-  when: item.client == inventory_hostname
+  when: ( item.client1 == inventory_hostname ) or ( item.client2 == inventory_hostname ) or ( item.client3 == inventory_hostname )
   with_items: "{{ _iscsi.target.disks }}"
 
 
