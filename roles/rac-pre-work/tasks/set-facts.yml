@@ -18,7 +18,7 @@
 
 - name: Set fact for Oracle Group List Except Oinstall Group
   set_fact:
-    oracle_group_list: "{{ _rac.install_group | selectattr('group', 'defined') | map(attribute='group') | reject('search','oinstall') | join(',') }}"
+    oracle_group_list: "{{ _oracle.install_group | selectattr('group', 'defined') | map(attribute='group') | reject('search','oinstall') | join(',') }}"
 
 
 - name: Set Default Network Device and Address

@@ -1,0 +1,74 @@
+---
+#======== =============================================================================
+# Install Oracle RAC DB 21.3.0 Software Only:
+# Assumption: 
+#  -  Oracle database pre install rpm downloaded
+#  -  Oracle Database software is downloaded and staged
+# (1) Check if Binaries are already installed
+# (2) Create required directories
+# (3) Unpack Oracle Database software to the Oracle Home directory into the first node
+# =====================================================================================
+
+- name: Check if Binaries are Already Installed
+  shell: grep "={{ oracle_home_name }}" {{ oracle_inventory }}/ContentsXML/inventory.xml
+  register: dbsoft_install_check
+  failed_when: false
+
+
+- name: Create Required Directories
+  remote_user: "{{ root_user }}"
+  file:
+    path="{{ item }}"
+    state=directory
+    owner="{{ oracle_user }}"
+    group="{{ oracle_install_group }}"
+    mode=0775
+  with_items:
+    - "{{ scripts_directory }}"
+    - "{{ oracle_base }}"
+    - "{{ stage_dir }}"
+    - "{{ softstage_dir }}"
+    - "{{ oracle_home }}"
+  # when: inventory_hostname in groups['dbservers']
+
+
+- name: Copy Database Pre Install 21c RPM Pfile to the Target Database Server
+  remote_user: "{{ root_user }}"
+  copy: src={{ item.fn }} dest={{ item.dest }} owner=grid group=oinstall mode=0775
+  with_items:
+    - { dest: "{{ stage_dir }}" ,    fn: "oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm" }
+    - { dest: "{{ softstage_dir }}", fn: "LINUX.X64_213000_db_home.zip" }
+  # copy: src=/etc/ansible/roles/racdbsoft21c_install/templates/{{ item }} dest={{ stage_dir }} owner=grid group=oinstall mode=0775
+
+
+- name: Install predbinstall RPM from a Local file
+  yum:
+    name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm
+    state: present
+    disable_gpg_check: yes
+  when: inventory_hostname in groups['ora_x1']
+  # name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el7.x86_64.rpm
+
+
+- name: Install predbinstall rpm from a local file
+  yum:
+    name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm
+    state: present
+    disable_gpg_check: yes
+  when: inventory_hostname in groups['ora_x2']
+  # name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el7.x86_64.rpm
+
+
+- name: Unpack Oracle 21c Database Software
+  remote_user: "{{ root_user }}"
+  become: yes
+  become_user: "{{ oracle_user }}"
+  unarchive:
+    src={{ softstage_dir }}/LINUX.X64_213000_db_home.zip
+    dest="{{ oracle_home }}"
+    remote_src=yes
+    mode=0775
+    group="{{ oracle_install_group }}"
+    owner="{{ oracle_user }}"
+  when: inventory_hostname in groups['ora_x1']
+

@@ -1,0 +1,25 @@
+---
+- name: Add Grid User
+  shell: /usr/sbin/useradd -u 54331 -g oinstall -G dba,asmadmin,asmdba,asmoper,racdba grid
+  changed_when: False
+  when: result|failed
+
+
+- name: Add User for Oracle
+  shell: /usr/sbin/useradd -u 54321 -g oinstall -G dba,backupdba,dgdba,kmdba,asmdba,oper,racdba,asmdba oracle
+  changed_when: False
+  when: result|failed
+
+
+- name: Change Password for Grid User
+  user:
+    name: "grid"
+    password: "{{ 'changeme' | password_hash('sha512') }}"
+
+
+- name: Change Password for Oracle User
+  user:
+    name: "oracle"
+    password: "{{ 'changeme' | password_hash('sha512') }}"
+
+

@@ -2,6 +2,7 @@
 ansible_ssh_pass: changeme
 ansible_become_pass: changeme
 
+ora_ver: "21c"
 
 _oracle:
   cluster_name: jack-kr-oracle
@@ -34,28 +35,17 @@ _oracle:
   base_dir:           "/u01/app/oracle"
   inventory:          "/u01/app/oraInventory"
   scripts_directory:  "/u01/app/scripts"
-  home_dir:           "/u01/app/oracle/product/21c/dbhome_1"
+  home_dir:           "/u01/app/oracle/product/{{ ora_ver }}/dbhome_1"
   rsp:                "Oracle_EE_SoftOnly"
   binary:             "LINUX.X64_193000_db_home.zip"  #  "LINUX.X64_213000_db_home.zip"
   install_group:
-    - { group: "oinstall",  gid: "1001" }
-    - { group: "dba",       gid: "1002" }
-    - { group: "oper",      gid: "1003" }
-    - { group: "backupdba", gid: "1004" }
-    - { group: "dgdba",     gid: "1005" }
-    - { group: "kmdba",     gid: "1006" }
-    - { group: "racdba",    gid: "1007" }
-    - { group: "asmdba",    gid: "1008" }
-    - { group: "asmadmin",  gid: "1009" }
-    - { group: "asmoper",   gid: "1010" }
-  #install_group:
-  #  - { group: "oinstall",  gid: "1501" }
-  #  - { group: "dba",       gid: "1502" }
-  #  - { group: "oper",      gid: "1503" }
-  #  - { group: "backupdba", gid: "1504" }
-  #  - { group: "dgdba",     gid: "1505" }
-  #  - { group: "kmdba",     gid: "1506" }
-  #  - { group: "racdba",    gid: "1507" }
+    - { group: "oinstall",  gid: "1501" }
+    - { group: "dba",       gid: "1502" }
+    - { group: "oper",      gid: "1503" }
+    - { group: "backupdba", gid: "1504" }
+    - { group: "dgdba",     gid: "1505" }
+    - { group: "kmdba",     gid: "1506" }
+    - { group: "racdba",    gid: "1507" }
   ports:
     - { proto: "tcp",       port: "1521" }
     - { proto: "tcp",       port: "5500" }
@@ -78,6 +68,76 @@ _oracle:
     rk9: [ "rk9-freeipa", "rk8-oracle01", "rk8-oracle02", "rk8-oracle03", "rk94-node00", "rk94-node99" ]
     ubt24: [ "ubt24-oracle", "rk9-freeipa" ]
   debug_opt: ""  # --debug
+
+
+_rac:
+  cluster_name: jack-kr-oracle-rac
+  major_version: "21"
+  minor_version: ""
+  patch_version: "c"
+  build_version: ""
+  os_version: el8
+  arch_type: x86_64
+  bin_type: rpm
+  db_name: oracle_testdb
+  db_user: jomoon
+  domain: "jtest.pivotal.io"
+  repo_url: ""
+  download_url: ""
+  download: false
+  # host_num: "{{ groups['all'] | length }}"
+  base_path: "/root"
+  user:               "oracle"
+  uid:                "1000"
+  gid:                "1001"
+  password:           "changeme"
+  root_user:          "root"
+  mount_directory:    "/"
+  root_directory:     "/u01"
+  app_dir:            "/u01/app"
+  stage_dir:          "/u01/stage"
+  sub_root_directory: "/u02"
+  sub_oradata:        "/u02/oradata"
+  base_dir:           "/u01/app/oracle"
+  inventory:          "/u01/app/oraInventory"
+  scripts_directory:  "/u01/app/scripts"
+  home_dir:           "/u01/app/oracle/product/{{ ora_ver }}/dbhome_1"
+  rsp:                "Oracle_EE_SoftOnly"
+  binary:             "LINUX.X64_193000_db_home.zip"  #  "LINUX.X64_213000_db_home.zip"
+  install_group:
+    - { group: "oinstall",  gid: "54321" }
+    - { group: "dba",       gid: "54322" }
+    - { group: "oper",      gid: "54323" }
+    - { group: "backupdba", gid: "54324" }
+    - { group: "dgdba",     gid: "54325" }
+    - { group: "kmdba",     gid: "54326" }
+    - { group: "asmdba",    gid: "54327" }
+    - { group: "asmoper",   gid: "54328" }
+    - { group: "asmadmin",  gid: "54329" }
+    - { group: "racdba",    gid: "54330" }
+  ports:
+    - { proto: "tcp",       port: "1521" }
+    - { proto: "tcp",       port: "5500" }
+    - { proto: "tcp",       port: "5520" }
+    - { proto: "tcp",       port: "3938" }
+  net:
+    type: "virtual"                # Or Physical
+    gateway: "192.168.0.1"
+    ipaddr0: "192.168.0.24"
+    ipaddr1: "192.168.1.24"
+    ipaddr2: "192.168.2.24"
+  client:
+    net:
+      type: "virtual"              # Or Physical
+      cores: 1
+      ipaddr0: "192.168.0.24"
+      ipaddr1: "192.168.1.24"
+      ipaddr2: "192.168.2.24"
+  vms:
+    rk9: [ "rk9-freeipa", "rk8-oracle01", "rk8-oracle02", "rk8-oracle03", "rk94-node00", "rk94-node99" ]
+    ubt24: [ "ubt24-oracle", "rk9-freeipa" ]
+  debug_opt: ""  # --debug
+
 
 
 _jdk:

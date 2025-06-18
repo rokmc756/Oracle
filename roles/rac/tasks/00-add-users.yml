@@ -1,0 +1,53 @@
+---
+#- name: Creating Installation Directories
+#  file: path={{ item }} state=directory mode=0755
+#  with_items:
+#    - "{{ _oracle.inventory }}"
+#    - "{{ _oracle.base_dir }}"
+#    - "{{ _oracle.stage_dir }}"
+#    - "{{ _oracle.home_dir }}"
+#    - "{{ _oracle.sub_root_directory }}"
+#    - "{{ _oracle.sub_oradata }}"
+
+
+- name: Create Groups
+  group:
+    name: "{{ item.group }}"
+    state: present
+    gid: "{{ item.gid }}"
+  loop: "{{ _rac.install_group }}"
+
+
+- name: Add Users Belonging to Oinstall Group and Install Groups
+  user:
+    name: "{{ item.user_name }}"
+    group: "oinstall"
+    groups: "{{ item.group_list }}"
+    state: present
+    append: yes
+    password: "{{ '{{ item.user_password }}' | password_hash('sha512') }}"
+  with_items:
+    - { user_name: "grid",   user_password: "changeme", group_list: "dba,asmadmin,asmdba,asmoper,racdba" }
+    - { user_name: "oracle", user_password: "changeme", group_list: "dba,backupdba,dgdba,kmdba,asmdba,oper,racdba,asmdba" }
+
+
+#- name: Change Ownership, Group and Permissions
+#  file:
+#    path: "{{ item }}"
+#    owner: oracle
+#    group: oinstall
+#    mode: '0755'
+#  with_items:
+#    - "{{ _oracle.inventory }}"
+#    - "{{ _oracle.base_dir }}"
+#    - "{{ _oracle.stage_dir }}"
+#    - "{{ _oracle.home_dir }}"
+#    - "{{ _oracle.root_directory }}"
+#    - "{{ _oracle.sub_root_directory }}"
+#    - "{{ _oracle.sub_oradata }}"
+
+
+#- name: Copy .bashrc into Oracle Home Directory
+#  template: src=bashrc.j2 dest=/home/oracle/.bashrc owner=oracle group=oinstall mode=644 force=yes
+#  register: copy_oracle_bashrc
+
