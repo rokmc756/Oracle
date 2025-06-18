@@ -1,0 +1,37 @@
+---
+# =============================================================================
+# Install Oracle GI 21.3.0 Software Only:
+# (1) Execute orainstRoot.sh scripts
+# =============================================================================
+
+- name: Execute orainstroot.sh on the Node 1
+  remote_user: "{{ root_user }}"
+  shell: /bin/sh "{{ ora_inventory }}/orainstRoot.sh"
+  register: gisw_orainstroonode1
+  tags:
+    - gisoftinstall_exeorainsroot
+  when: inventory_hostname in groups['ora-x1'] 
+
+
+- name: Output from gisw_orainstroonode1
+  debug:
+    var: gisw_orainstroonode1.stdout_lines
+    verbosity: 0
+  when: inventory_hostname in groups['ora-x1'] 
+
+
+- name: Execute orainstroot.sh on Node 2
+  remote_user: "{{ root_user }}"
+  shell: /bin/sh "{{ ora_inventory }}/orainstRoot.sh"
+  register: gisw_orainstroonode2
+  tags:
+    - gisoftinstall_exeorainsroot
+  when: inventory_hostname in groups['ora-x2']
+
+
+- name: Output from gisw_orainstroonode2
+  debug:
+    var: gisw_orainstroonode2.stdout_lines
+    verbosity: 0
+  when: inventory_hostname in groups['ora-x2']
+
