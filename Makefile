@@ -72,7 +72,7 @@ download:
 		ln -sf ansible-hosts-rk8 ansible-hosts;\
 	elif [ "${*}" = "oracle" ]; then\
 		ln -sf ansible-hosts-rk8-single ansible-hosts;\
-	elif [ "${*}" = "rac" ]; then\
+	elif [ "${*}" = "rac" ] || [ "${*}" = "racgi" ]; then\
 		ln -sf ansible-hosts-rk8-rac ansible-hosts;\
 	elif [ "${*}" = "iscsi" ]; then\
 		ln -sf ansible-hosts-rk8 ansible-hosts;\
@@ -83,6 +83,7 @@ download:
 	@cat Makefile.tmp  | sed -e 's/temp/${*}/g' > Makefile.${*}
 	@make -f Makefile.${*} r=${r} s=${s} c=${c} USERNAME=${USERNAME}
 	@rm -f setup-${*}.yml Makefile.${*}
+
 
 
 # For All Roles

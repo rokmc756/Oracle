@@ -10,14 +10,14 @@
   register: gisw_orainstroonode1
   tags:
     - gisoftinstall_exeorainsroot
-  when: inventory_hostname in groups['ora-x1'] 
+  when: inventory_hostname in groups['ora_x1']
 
 
 - name: Output from gisw_orainstroonode1
   debug:
     var: gisw_orainstroonode1.stdout_lines
     verbosity: 0
-  when: inventory_hostname in groups['ora-x1'] 
+  when: inventory_hostname in groups['ora_x1']
 
 
 - name: Execute orainstroot.sh on Node 2
@@ -26,12 +26,12 @@
   register: gisw_orainstroonode2
   tags:
     - gisoftinstall_exeorainsroot
-  when: inventory_hostname in groups['ora-x2']
+  when: inventory_hostname in groups['ora_x2']
 
 
 - name: Output from gisw_orainstroonode2
   debug:
     var: gisw_orainstroonode2.stdout_lines
     verbosity: 0
-  when: inventory_hostname in groups['ora-x2']
+  when: inventory_hostname in groups['ora_x2']
 

@@ -1,3 +1,4 @@
+---
 - name: Check .ssh Local Directory under Root Home Directory Exists
   become_user: root
   stat:
@@ -5,7 +6,7 @@
   register: ssh_directory_exists_check
 
 
-- name: Create .bash_history Under Root User Directory if not Exist
+- name: Create .bash_history under Root User Directory if Not Exist
   become_user: root
   copy:
     dest: ~/.bash_history
@@ -13,7 +14,7 @@
     force: no
 
 
-- name: Add Sudo Line to bash_history under Root User Directory
+- name: Add Sudo Line to Bash History under Root User Directory
   become_user: root
   lineinfile:
     dest: /root/.bash_history
@@ -21,14 +22,14 @@
     state: "present"
 
 
-- name: Check .ssh Root Local Directory
+- name: Check .ssh Local Directory of Root User Exists
   become_user: root
   stat:
     path: ~/.ssh
   register: ssh_root_directory_exists_check
 
 
-- name: Create .ssh Root Local Directory
+- name: Create ~/.ssh Directory in Root Home Directory
   become_user: root
   file:
     path: "~/.ssh"
@@ -40,7 +41,7 @@
   when: ssh_root_directory_exists_check is defined and ssh_root_directory_exists_check.stat.exists == false
 
 
-- name: Check if .ssh key File of Root User Exists
+- name: Check if .ssh Key File of Root User Exists
   become_user: root
   stat:
     path: "~/.ssh/{{ item }}"
@@ -55,7 +56,7 @@
   shell: "ssh-keyscan -t rsa {{ item }} >> ~/.ssh/known_hosts"
   register: ssh_root_fingerprint_add
   with_items:
-    - "{{ groups['servers'] }}"
+    - "{{ groups['all'] }}"
 
 
 - name: Generate SSH Key of Root User on Local Machine
@@ -72,7 +73,7 @@
   shell: "sshpass -p \"{{ root_user_pass }}\" ssh-copy-id -i ~/.ssh/{{ ssh_key_filename }}.pub \"root@{{ item }}\""
   register: ssh_copy_root_id_execution
   with_items:
-    - "{{ groups['servers'] }}"
+    - "{{ groups['all'] }}"
   failed_when:
     - ssh_copy_root_id_execution.rc != 0
 
@@ -93,10 +94,10 @@
 - name: Copy Root User SSH Key from Local to All Hosts
   become_user: "{{ local_sudo_user }}"
   shell: |
-    sshpass -p "changeme" ssh-copy-id -f -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.pub root@{{ hostvars[item][_netdev]['ipv4']['address'] }}
+    sshpass -p "changeme" ssh-copy-id -f -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.pub root@{{ _ipaddr }}
   register: ssh_copy_id_keys
-  with_items: "{{ groups['servers'] }}"
+  with_items: "{{ groups['all'] }}"
   delegate_to: localhost
   failed_when: ssh_copy_id_keys.rc != 0
-  when: inventory_hostname in hostvars[groups['servers'][0]].ansible_hostname
+  when: inventory_hostname in hostvars[groups['all'][0]].ansible_hostname
 

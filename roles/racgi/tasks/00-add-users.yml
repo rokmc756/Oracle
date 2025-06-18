@@ -1,0 +1,21 @@
+---
+- name: Create Groups
+  group:
+    name: "{{ item.group }}"
+    state: present
+    gid: "{{ item.gid }}"
+  loop: "{{ _rac.install_group }}"
+
+
+- name: Add Users Belonging to Oinstall Group and Install Groups
+  user:
+    name: "{{ item.user_name }}"
+    group: "oinstall"
+    groups: "{{ item.group_list }}"
+    state: present
+    append: yes
+    password: "{{ '{{ item.user_password }}' | password_hash('sha512') }}"
+  with_items:
+    - { user_name: "grid",   user_password: "changeme", group_list: "dba,asmadmin,asmdba,asmoper,racdba" }
+    - { user_name: "oracle", user_password: "changeme", group_list: "dba,backupdba,dgdba,kmdba,asmdba,oper,racdba,asmdba" }
+

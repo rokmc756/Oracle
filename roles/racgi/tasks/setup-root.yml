@@ -9,9 +9,9 @@
   become: yes
   shell: "{{ grid_home }}/root.sh"
   register: rootnode1
-  tags:
-    - gisoftinstall_exeroot
-  when: inventory_hostname in groups['ora-x1'] 
+  # tags:
+  #  - gisoftinstall_exeroot
+  when: inventory_hostname in groups['ora_x1']
 
 
 - name: Get the Logfile Name on the First Node
@@ -19,7 +19,7 @@
   become: yes
   shell: "echo {{ rootnode1.stdout }} | grep -oP '(?<=Check).*?(?=for)' "
   register: logfile
-  when: inventory_hostname in groups['ora-x1']
+  when: inventory_hostname in groups['ora_x1']
 
 
 - name: Get the Logfile Information on the First Node
@@ -31,12 +31,12 @@
   args:
     chdir: /u01/app
   register: rootloginfon1
-  when: inventory_hostname in groups['ora-x1']
+  when: inventory_hostname in groups['ora_x1']
 
 
 - debug:
     var: rootloginfon1.results[0].stdout_lines
-  when: inventory_hostname in groups['ora-x1']
+  when: inventory_hostname in groups['ora_x1']
 
 
 - name: Execute root.sh on the Second Node
@@ -44,9 +44,9 @@
   become: yes
   shell: "{{ grid_home }}/root.sh"
   register: rootnode2
-  tags:
-    - gisoftinstall_exeroot
-  when: inventory_hostname in groups['ora-x2'] 
+  # tags:
+  #  - gisoftinstall_exeroot
+  when: inventory_hostname in groups['ora_x2'] 
 
 
 - name: Get the Logfile Information on the Second Node
@@ -54,11 +54,11 @@
   become: yes
   shell: "echo {{ rootnode2.stdout }} | grep -oP '(?<=Check).*?(?=for)' "
   register: logfile
-  when: inventory_hostname in groups['ora-x2']
+  when: inventory_hostname in groups['ora_x2']
 
 
 - name: Get the logfile Information on the Second Node
-  when: inventory_hostname in groups['ora-x2']
+  when: inventory_hostname in groups['ora_x2']
   remote_user: "{{ root_user }}"
   become: yes
   shell: "cat {{ logfile.stdout }} "
@@ -71,6 +71,6 @@
 
 - debug:
     var: rootloginfon2.results[0].stdout_lines
-  when: inventory_hostname in groups['ora-x2']
+  when: inventory_hostname in groups['ora_x2']
 
 

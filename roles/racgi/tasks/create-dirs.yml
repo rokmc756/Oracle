@@ -1,6 +1,5 @@
 ---
 - name: Create Required Directories
-  when: inventory_hostname in groups['dbservers']
   remote_user: "{{ root_user }}"
   file:
     path="{{ item }}"
@@ -14,8 +13,9 @@
     - "{{ ora_inventory }}"
     - "{{ grid_base }}"
     - "{{ grid_home }}"
-  tags:
-    - gisoftinstall_credits
+  # tags:
+  #  - gisoftinstall_credits
+  when: inventory_hostname in groups['dbservers']
 
 
 - name: Change Owner for Grid

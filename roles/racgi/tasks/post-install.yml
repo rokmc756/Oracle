@@ -8,13 +8,13 @@
 - name: Add Oratab Entry to First Node
   remote_user: "{{ root_user }}"
   lineinfile: dest=/etc/oratab line="{{ ASMI }}1:{{ grid_home }}:Y" state=present
-  when: inventory_hostname in groups['ora-x1']
+  when: inventory_hostname in groups['ora_x1']
 
 
 - name: Add Oratab Entry to Second Node
   remote_user: "{{ root_user }}"
   lineinfile: dest=/etc/oratab line="{{ ASMI }}2:{{ grid_home }}:Y" state=present
-  when: inventory_hostname in groups['ora-x2']
+  when: inventory_hostname in groups['ora_x2']
 
 
 - name: Check CRS Resources and Status
@@ -23,11 +23,11 @@
   become_user: "{{ grid_user }}"
   shell: "{{ grid_home }}/bin/crsctl stat res -t"
   register: crsctl_resstat
-  when: inventory_hostname in groups['ora-x1']
+  when: inventory_hostname in groups['ora_x1']
 
 
 - debug: var=crsctl_resstat.stdout_lines
-  when: inventory_hostname in groups['ora-x1']
+  when: inventory_hostname in groups['ora_x1']
 
 
 - name: Check Cluster Status
@@ -36,24 +36,24 @@
   become_user: "{{ grid_user }}"
   shell: "{{ grid_home }}/bin/crsctl check cluster -all"
   register: cluster_stat
-  when: inventory_hostname in groups['ora-x1']
+  when: inventory_hostname in groups['ora_x1']
 
 
 - debug: var=cluster_stat.stdout_lines
-  when: inventory_hostname in groups['ora-x1']
+  when: inventory_hostname in groups['ora_x1']
 
 
 - name: Check ASM Cluster Mode
-  when: inventory_hostname in groups['ora-x1']
   remote_user: "{{ root_user }}"
   become: yes
   become_user: "{{ grid_user }}"
   action: shell export GRID_HOME={{ grid_home }}; {{ grid_home }}/bin/asmcmd showclustermode
   register: asmcluster_mode
+  when: inventory_hostname in groups['ora_x1']
 
 
 - debug: var=asmcluster_mode.stdout_lines
-  when: inventory_hostname in groups['ora-x1']
+  when: inventory_hostname in groups['ora_x1']
 
 
 - name: Ensure Bash Profile File Exists
@@ -79,8 +79,7 @@
       export LD_LIBRARY_PATH=/usr/lib:/lib
       export NLS_LANG=AMERICAN_AMERICA.UTF8
       export NLS_DATE_FORMAT='DD-MM-YYYY:HH24:MI:SS'
-      export ORACLE_BASE="{{grid_base}}"
-      export ORACLE_HOME="{{grid_home}}"
+      export ORACLE_BASE="{{ grid_base }}"
+      export ORACLE_HOME="{{ grid_home }}"
       export PATH=$ORACLE_HOME/bin:$PATH
-
 

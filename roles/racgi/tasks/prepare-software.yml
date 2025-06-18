@@ -9,59 +9,72 @@
 
 - name: Copy Grid 21c Grid Software Response File to the Target Database Server
   remote_user: "{{ root_user }}"
-  copy: src=/etc/ansible/roles/racgi21c_install/templates/{{ item }} dest={{ stage_dir }} owner=grid group=oinstall mode=0775
+  copy: src=templates/{{ item }} dest={{ stage_dir }} owner=grid group=oinstall mode=0775
   with_items:
     - gridsetup21c.rsp
-    - oracle-database-preinstall-21c-1.0-1.el7.x86_64.rpm
-  tags:
-    - gisoftinstall_cprspfile
+
+  # tags:
+  #  - gisoftinstall_cprspfile
+  #  - oracle-database-preinstall-21c-1.0-1.el7.x86_64.rpm
+
+
+- name: Copy Database Pre Install 21c RPM Pfile to the Target Database Server
+  remote_user: "{{ root_user }}"
+  copy: src={{ item.fn }} dest={{ item.dest }} owner=grid group=oinstall mode=0775
+  with_items:
+    - { dest: "{{ stage_dir }}" ,    fn: "oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm" }
+    - { dest: "{{ software_dir }}", fn: "LINUX.X64_213000_grid_home.zip" }
 
 
 - name: Unpack Oracle 21c GI Software
-  when: inventory_hostname in groups['ora-x1']
   remote_user: "{{ root_user }}"
   become: yes
   become_user: "{{ grid_user }}"
   unarchive:
      src={{ software_dir }}/LINUX.X64_213000_grid_home.zip
      dest="{{ grid_home }}"
-     remote_src=no
      mode=0775
      group="{{ oracle_install_group }}"
      owner="{{ grid_user }}"
-  tags:
-    - gisoftinstall_unpacksoft
+     remote_src=yes
+  when: inventory_hostname in groups['ora_x1']
+
+  # tags:
+  # - gisoftinstall_unpacksoft
 
 
 - name: Install CVU RPM from Local File
-  when: inventory_hostname in groups['ora-x1']  
   yum:
     name: /u02/app/21.3.0/grid/cv/rpm/cvuqdisk-1.0.10-1.rpm
     state: present
+    disable_gpg_check: yes
+  when: inventory_hostname in groups['ora_x1']
 
 
-- name: Transfer CVU File from ora-x1 to ora-x2
-  when: inventory_hostname in groups['ora-x1']
+- name: Transfer CVU File from ora_x1 to ora_x2
   synchronize:
     src: /u02/app/21.3.0/grid/cv/rpm/cvuqdisk-1.0.10-1.rpm
     dest: /u02/stage/cvuqdisk-1.0.10-1.rpm
     mode: pull
-  delegate_to: ora-x2
+  delegate_to: rk8-oracle03
+  when: inventory_hostname in groups['ora_x1']
 
 
 - name: Install CVU RPM from Local File
-  when: inventory_hostname in groups['ora-x2']  
   yum:
     name: /u02/stage/cvuqdisk-1.0.10-1.rpm
     state: present
+    disable_gpg_check: yes
+  when: inventory_hostname in groups['ora_x2']
 
 
 - name: Run Cluster Verification Checks for CRS Installation
-  when: inventory_hostname in groups['ora-x1']
   become: yes
   become_user: grid
-  command:            '{{ grid_home}}/runcluvfy.sh stage -post crsinst -n "ora-x1,ora-x2" -verbose'
+  shell: |
+    {{ grid_home}}/runcluvfy.sh stage -post crsinst -n "ora_x1,ora_x2" -verbose
   register:           cluvfy_stage_pre_crsinst
   failed_when:        false
   no_log:             true
+  when: inventory_hostname in groups['ora_x1']
 

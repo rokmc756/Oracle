@@ -14,41 +14,89 @@
 # (5) Run necessay root scripts
 # =============================================================================
 
-- name: Display Pre Installation of Oracle Grid Infrastructure Software Message
-  debug:
-    msg:
-      - 'This playbook is for installing Oracle RAC GI software 21c , started at {{ansible_date_time.iso8601}}:'
+
+#- name: Display Pre Installation of Oracle Grid Infrastructure Software Message
+#  debug:
+#    msg:
+#      - 'This playbook is for installing Oracle RAC GI software 21c , started at {{ansible_date_time.iso8601}}:'
+
+
+- name: Check OS ( Oracle )
+  fail: msg="Not a Red Hat based system!"
+  when: ansible_os_family != 'RedHat' or ansible_os_family != 'CentOS' or ansible_os_family != 'Rocky'
+
+
+- name: Set Facts for Network and Packages Informations
+  import_tasks: set-facts.yml
+  tags: prepare, install, uninstall, add, setup, execute, remove, validate, finalize, create, delete
+
+
+- name: Modify OS Settings
+  import_tasks: modify-os-setting.yml
+  tags: prepare, install
+  when: ( os is defined and os == true ) or ( racgi_all is defined and racgi_all == true )
+
+
+- name: Modify Oracle Settings
+  import_tasks: modify-oracle-setting.yml
+  tags: prepare, install
+  when: ( oracle is defined and oracle == true ) or ( racgi_all is defined and racgi_all == true )
+
+
+- name: Add Group and Users
+  import_tasks: 00-add-users.yml
+  tags: add, install
+  when: ( user is defined and user == true ) or ( racgi_all is defined and racgi_all == true )
+  # import_tasks: oracle-userngroup.yml
+
+
+- name: Create Required Directories
+  import_tasks: create-required-dirs.yml
+  tags: create, install
+  when: ( dir is defined and dir == true ) or ( racgi_all is defined and racgi_all == true )
+
+
+- name: Setup NTP Server
+  import_tasks: setup-chrony.yml
+  tags: setup, install
+  when: ( ntp is defined and ntp == true ) or ( racgi_all is defined and racgi_all == true )
+  # import_tasks: install-ntp.yml
 
 
 - name: Preparation Tasks for Installing Oracle Grid Infrastructure Software
-  block:
-    - import_tasks:     modify_os_setting.yml
-    - import_tasks:     modify_oracle_setting.yml
-    - import_tasks:     oracle_userngroup.yml
-    - import_tasks:     create_required_dirs.yml
-    - import_tasks:     install_ntp.yml
-    - import_tasks:     racgi21c_preinstall.yml
-  become:               yes
-  become_user:          root
-  tags:
-    - gisoft_pretasks
+  import_tasks: prepare-software.yml
+  tags: prepare, install
+  when: ( software is defined and software == true ) or ( racgi_all is defined and racgi_all == true )
 
 
 - name: Install Oracle Grid Infraintrastructure Software Using Ansible
-  block:
-    - import_tasks: racgi21c_softinstall.yml
-    - import_tasks: racgi21c_oinsroot.yml
-    - import_tasks: racgi21c_root.yml
-  become:           yes
-  become_user:      root
+  import_tasks: install-software.yml
+  tags: setup, install
+  when: ( software is defined and software == true ) or ( racgi_all is defined and racgi_all == true )
+
+
+- name: Install Oracle Grid Infraintrastructure Software Using Ansible
+  import_tasks: setup-oinsroot.yml
+  tags: setup, install
+  when: ( oinsroot is defined and oinsroot == true ) or ( racgi_all is defined and racgi_all == true )
+
+
+- name: Install Oracle Grid Infraintrastructure Software Using Ansible
+  import_tasks: setup-root.yml
+  tags: setup, install
+  when: ( root is defined and root == true ) or ( racgi_all is defined and racgi_all == true )
 
 
 - name: Post Oracle Grid Infrastructure Installation Tasks
-  block:
-    - import_tasks: racgi21c_ConfigTools.yml
-    - import_tasks: racgi21c_postinstall.yml
-  become:           yes
-  become_user:      root
+  import_tasks: config-tools.yml
+  tags: config, install
+  when: ( tools is defined and tools == true ) or ( racgi_all is defined and racgi_all == true )
+
+
+- name: Finalize Software
+  import_tasks: post-install.yml
+  tags: finalize, install
+  when: ( software is defined and software == true ) or ( racgi_all is defined and racgi_all == true )
 
 
 - name: Remove Stage Directory
@@ -58,12 +106,15 @@
     state: absent
   with_items:
     - "{{ stage_dir }}"
+  tags: remove, install
+  when: ( stage is defined and stage == true ) or ( racgi_all is defined and racgi_all == true )
 
 
-- name: Display Post Install Message
-  debug:
-    msg:
-      - 'This Steps completed below task for Single Instance at {{ansible_date_time.iso8601}}:'
-      - '- Install Oracle Grid Infrastructure 21c on two node RAC cluster ora-x1 and ora-x2'
-      - '- END OF ALL: git repository GI_21cSoftInstall will be shared'
+# - name: Display Post Install Message
+#  debug:
+#    msg:
+#      - 'This Steps completed below task for Single Instance at {{ansible_date_time.iso8601}}:'
+#      - '- Install Oracle Grid Infrastructure 21c on two node RAC cluster ora_x1 and ora_x2'
+#      - '- END OF ALL: git repository GI_21cSoftInstall will be shared'
+
 
