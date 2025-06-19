@@ -33,69 +33,69 @@
 
 - name: Modify OS Settings
   import_tasks: modify-os-setting.yml
-  tags: prepare, install
+  tags: prepare
   when: ( os is defined and os == true ) or ( racgi_all is defined and racgi_all == true )
 
 
 - name: Modify Oracle Settings
   import_tasks: modify-oracle-setting.yml
-  tags: prepare, install
+  tags: prepare
   when: ( oracle is defined and oracle == true ) or ( racgi_all is defined and racgi_all == true )
 
 
 - name: Add Group and Users
   import_tasks: 00-add-users.yml
-  tags: add, install
+  tags: add
   when: ( user is defined and user == true ) or ( racgi_all is defined and racgi_all == true )
   # import_tasks: oracle-userngroup.yml
 
 
 - name: Create Required Directories
   import_tasks: create-required-dirs.yml
-  tags: create, install
+  tags: create
   when: ( dir is defined and dir == true ) or ( racgi_all is defined and racgi_all == true )
 
 
 - name: Setup NTP Server
   import_tasks: setup-chrony.yml
-  tags: setup, install
+  tags: setup
   when: ( ntp is defined and ntp == true ) or ( racgi_all is defined and racgi_all == true )
   # import_tasks: install-ntp.yml
 
 
 - name: Preparation Tasks for Installing Oracle Grid Infrastructure Software
   import_tasks: prepare-software.yml
-  tags: prepare, install
+  tags: prepare
   when: ( software is defined and software == true ) or ( racgi_all is defined and racgi_all == true )
 
 
 - name: Install Oracle Grid Infraintrastructure Software Using Ansible
   import_tasks: install-software.yml
-  tags: setup, install
+  tags: setup
   when: ( software is defined and software == true ) or ( racgi_all is defined and racgi_all == true )
 
 
 - name: Install Oracle Grid Infraintrastructure Software Using Ansible
   import_tasks: setup-oinsroot.yml
-  tags: setup, install
+  tags: setup
   when: ( oinsroot is defined and oinsroot == true ) or ( racgi_all is defined and racgi_all == true )
 
 
 - name: Install Oracle Grid Infraintrastructure Software Using Ansible
   import_tasks: setup-root.yml
-  tags: setup, install
+  tags: setup
   when: ( root is defined and root == true ) or ( racgi_all is defined and racgi_all == true )
 
 
 - name: Post Oracle Grid Infrastructure Installation Tasks
   import_tasks: config-tools.yml
-  tags: config, install
+  tags: config
   when: ( tools is defined and tools == true ) or ( racgi_all is defined and racgi_all == true )
 
 
 - name: Finalize Software
   import_tasks: post-install.yml
-  tags: finalize, install
+  tags: finalize
   when: ( software is defined and software == true ) or ( racgi_all is defined and racgi_all == true )
 
 
@@ -106,7 +106,7 @@
     state: absent
   with_items:
     - "{{ stage_dir }}"
-  tags: remove, install
+  tags: remove
   when: ( stage is defined and stage == true ) or ( racgi_all is defined and racgi_all == true )
 
 
