@@ -16,23 +16,5 @@
   with_items: "{{ _iscsi.target.disks }}"
 - debug: msg={{ config_udev }}
 
-
-- name: Test UDEV
-  shell: |
-    udevadm test /block/{{ item.iscsi_dev }}/{{ item.iscsi_dev }}1
-  register: test_udev
-  with_items: "{{ _iscsi.target.disks }}"
-  when: inventory_hostname == "rk8-oracle03"
-- debug: msg={{ test_udev }}
-  when: inventory_hostname == "rk8-oracle03"
-
-
-- name: Check UDEV
-  shell: |
-    ls -al /dev/rac
-  register: check_udev
-  when: inventory_hostname == "rk8-oracle03"
-- debug: msg={{ check_udev }}
-  when: inventory_hostname == "rk8-oracle03"
-
+- import_tasks: ext/reboot-hosts.yml
 

@@ -1,0 +1,15 @@
+---
+- name: Test UDEV
+  shell: |
+    udevadm test /block/{{ item.iscsi_dev }}/{{ item.iscsi_dev }}1
+  register: test_udev
+  with_items: "{{ _iscsi.target.disks }}"
+- debug: msg={{ test_udev }}
+
+
+- name: Check UDEV
+  shell: |
+    ls -al /dev/rac
+  register: check_udev
+- debug: msg={{ check_udev }}
+

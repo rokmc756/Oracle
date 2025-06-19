@@ -6,7 +6,7 @@
 
 - name: Set Facts for Network and Packages Informations
   import_tasks: set-facts.yml
-  tags: install, uninstall, setup, remove, enable, disable, create, delete, reboot
+  tags: install, uninstall, setup, remove, enable, disable, create, delete, reboot, test
 
 
 - name: Disable Firewalld
@@ -43,6 +43,12 @@
 #  when: (( multipath is defined and multipath == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
 
 
+#- name: Disable Multipath
+#  import_tasks: mp/disable-multipath.yml
+#  tags: disable, remove, uninstall
+#  when: (( multipath is defined and multipath == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
+
+
 - name: Create Partition
   import_tasks: create-partition.yml
   tags: create, install
@@ -61,16 +67,17 @@
   when: (( udev is defined and udev == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
 
 
+- name: Test UDEV
+  import_tasks: test-udev.yml
+  tags: test, install
+  when: (( udev is defined and udev == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
+
+
 - name: Remove UDEV
   import_tasks: remove-udev.yml
   tags: remove, uninstall
   when: (( udev is defined and udev == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
 
-
-#- name: Disable Multipath
-#  import_tasks: mp/disable-multipath.yml
-#  tags: disable, remove, uninstall
-#  when: (( multipath is defined and multipath == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
 
 
 - name: Uninstall iSCSI Initiator

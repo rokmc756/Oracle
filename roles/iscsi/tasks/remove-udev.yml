@@ -6,3 +6,6 @@
   register: remove_udev_config
 
 
+- import_tasks: ext/reboot-hosts.yml
+
+
