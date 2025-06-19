@@ -37,7 +37,7 @@
 
 
 - name: Add Oracle Groups and Users
-  import_tasks: add-oracle-users.ynml
+  import_tasks: add-oracle-users.yml
   tags: init, install
   when: inventory_hostname in groups['servers']
 

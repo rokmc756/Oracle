@@ -29,6 +29,7 @@
     state: directory
     mode: "0700"
     owner: "{{ grid_user }}"
+    group: "oinstall"
   register: ssh_user_directory_creation
   when: ssh_user_directory_exists_check is defined and ssh_user_directory_exists_check.stat.exists == false
 
@@ -100,7 +101,7 @@
 - name: Copy Sudo User SSH Key from Local to All Hosts
   become_user: "{{ local_sudo_user }}"
   shell: |
-    sshpass -p "changeme" ssh-copy-id -f -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.pub {{ grid_user }}@{{ hostvars[item]['ansible_'~_netdev]['ipv4']['address'] }}
+    sshpass -p "{{ grid_user_pass }}" ssh-copy-id -f -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.pub {{ grid_user }}@{{ hostvars[item][_netdev]['ipv4']['address'] }}
   register: ssh_copy_id_keys
   with_items: "{{ groups['servers'] }}"
   delegate_to: localhost

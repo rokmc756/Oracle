@@ -1,13 +1,13 @@
 # ansible_ssh_pass: "changeme"
 # ansible_become_pass: "changeme"
 
-sudo_user: "oradmin"
-sudo_group: "oradmin"
+sudo_user: "oraadm"
+sudo_group: "oraadm"
 
 oracle_user: "oracle"
 oracle_user_pass: "changeme"
 
-grid_user: "oracle"
+grid_user: "grid"
 grid_user_pass: "changeme"
 
 local_sudo_user: "jomoon"

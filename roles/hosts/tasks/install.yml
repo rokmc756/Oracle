@@ -40,7 +40,7 @@
   user:
     name: "{{ sudo_user }}"
     state: present
-    password: "{{ 'changeme' | password_hash('sha512','A512') }}"
+    password: "{{ sudo_user_pass | password_hash('sha512','A512') }}"
     shell: /bin/bash
     group: "{{ sudo_group }}"
     createhome: yes

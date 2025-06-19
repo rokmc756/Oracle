@@ -49,6 +49,7 @@
     name: "{{ item.group }}"
     state: absent
     gid: "{{ item.gid }}"
+    force: true
   loop: "{{ _oracle.install_group }}"
 
 

@@ -1,5 +1,5 @@
 ---
-- name: Create Groups
+- name: Create Oracle Groups
   group:
     name: "{{ item.group }}"
     state: present
@@ -10,12 +10,49 @@
 - name: Add Users Belonging to Oinstall Group and Install Groups
   user:
     name: "{{ item.user_name }}"
+    state: present
+    password: "{{ item.user_password | password_hash('sha512','A512') }}"
+    shell: /bin/bash
     group: "oinstall"
     groups: "{{ item.group_list }}"
-    state: present
+    createhome: yes
+    home: "/home/{{ item.user_name }}"
     append: yes
-    password: "{{ '{{ item.user_password }}' | password_hash('sha512') }}"
   with_items:
     - { user_name: "grid",   user_password: "changeme", group_list: "dba,asmadmin,asmdba,asmoper,racdba" }
     - { user_name: "oracle", user_password: "changeme", group_list: "dba,backupdba,dgdba,kmdba,asmdba,oper,racdba,asmdba" }
+
+
+- name: Add Group to /etc/sudoers File Without Password
+  become_user: root
+  lineinfile: "dest=/etc/sudoers state=present regexp='^%{{ item.user_name }}' line='%{{ item.user_name }} ALL=(ALL) NOPASSWD: ALL'"
+  with_items:
+    - { user_name: "grid" }
+    - { user_name: "oracle" }
+
+
+- name: Read /etc/group Entries
+  # become: true
+  shell: "/usr/bin/getent group | grep ^sudo{{':'}} | cut -f4 -d{{':'}}"
+  register: etc_group
+  changed_when: false
+
+
+- name: Split Group Members
+  set_fact:
+    etc_group_members: "{{ etc_group.stdout.split(',') }}"
+    changed_when: false
+
+
+- name: Add User to 'sudo' Group (Debian)
+  user:
+    name: "{{ item.user_name }}"
+    groups: sudo
+    append: true
+    state: present
+    createhome: true
+  with_items:
+    - { user_name: "grid" }
+    - { user_name: "oracle" }
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
