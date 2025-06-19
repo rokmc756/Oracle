@@ -43,13 +43,6 @@
   when: ( oracle is defined and oracle == true ) or ( racgi_all is defined and racgi_all == true )
 
 
-- name: Add Group and Users
-  import_tasks: 00-add-users.yml
-  tags: add
-  when: ( user is defined and user == true ) or ( racgi_all is defined and racgi_all == true )
-  # import_tasks: oracle-userngroup.yml
-
-
 - name: Create Required Directories
   import_tasks: create-required-dirs.yml
   tags: create
@@ -60,28 +53,27 @@
   import_tasks: setup-chrony.yml
   tags: setup
   when: ( ntp is defined and ntp == true ) or ( racgi_all is defined and racgi_all == true )
-  # import_tasks: install-ntp.yml
 
 
 - name: Preparation Tasks for Installing Oracle Grid Infrastructure Software
   import_tasks: prepare-software.yml
   tags: prepare
-  when: ( software is defined and software == true ) or ( racgi_all is defined and racgi_all == true )
+  when: (( software is defined and software == true ) or ( racgi_all is defined and racgi_all == true )) and inventory_hostname in groups['dbservers']
 
 
-- name: Install Oracle Grid Infraintrastructure Software Using Ansible
-  import_tasks: install-software.yml
+- name: Setup Oracle Grid Infraintrastructure Software
+  import_tasks: setup-software.yml
   tags: setup
   when: ( software is defined and software == true ) or ( racgi_all is defined and racgi_all == true )
 
 
-- name: Install Oracle Grid Infraintrastructure Software Using Ansible
+- name: Install Oracle Grid Infraintrastructure Software
   import_tasks: setup-oinsroot.yml
   tags: setup
   when: ( oinsroot is defined and oinsroot == true ) or ( racgi_all is defined and racgi_all == true )
 
 
-- name: Install Oracle Grid Infraintrastructure Software Using Ansible
+- name: Install Oracle Grid Infraintrastructure Software
   import_tasks: setup-root.yml
   tags: setup
   when: ( root is defined and root == true ) or ( racgi_all is defined and racgi_all == true )
@@ -108,13 +100,6 @@
     - "{{ stage_dir }}"
   tags: remove
   when: ( stage is defined and stage == true ) or ( racgi_all is defined and racgi_all == true )
-
-
-- name: Delete Group and Users
-  import_tasks: 00-delete-users.yml
-  tags: delete
-  when: ( user is defined and user == true ) or ( racgi_all is defined and racgi_all == true )
-  # import_tasks: oracle-userngroup.yml
 
 
 # - name: Display Post Install Message

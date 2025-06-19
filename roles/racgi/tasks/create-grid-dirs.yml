@@ -13,7 +13,6 @@
     - "{{ ora_inventory }}"
     - "{{ grid_base }}"
     - "{{ grid_home }}"
-  tags:
-    - gisoftinstall_credits
+    - "{{ software_dir }}"      ## Added Manually
   when: inventory_hostname in groups['dbservers']
 

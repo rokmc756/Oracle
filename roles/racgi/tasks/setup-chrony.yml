@@ -36,15 +36,6 @@
   when: print_debug == true
 
 
-#- name: Enable NTP Service
-#  shell: |
-#    firewall-cmd --add-service=ntp
-#    firewall-cmd --runtime-to-permanent
-#  register: enable_ntp_service
-#- debug: msg={{ enable_ntp_service }}
-#  when: print_debug == true
-
-
 - name: Set Hostname
   shell: |
     hostnamectl set-hostname {{ inventory_hostname }}

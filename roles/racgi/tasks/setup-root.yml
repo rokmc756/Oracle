@@ -1,6 +1,6 @@
 ---
 # =============================================================================
-# Install Oracle GI 21.3.0 Software Only:
+# Install Oracle GI 21.3.0 Software Only
 # (1) Execute root.sh scripts
 # =============================================================================
 
@@ -9,8 +9,6 @@
   become: yes
   shell: "{{ grid_home }}/root.sh"
   register: rootnode1
-  # tags:
-  #  - gisoftinstall_exeroot
   when: inventory_hostname in groups['ora_x1']
 
 
@@ -44,8 +42,6 @@
   become: yes
   shell: "{{ grid_home }}/root.sh"
   register: rootnode2
-  # tags:
-  #  - gisoftinstall_exeroot
   when: inventory_hostname in groups['ora_x2'] 
 
 
@@ -58,7 +54,6 @@
 
 
 - name: Get the logfile Information on the Second Node
-  when: inventory_hostname in groups['ora_x2']
   remote_user: "{{ root_user }}"
   become: yes
   shell: "cat {{ logfile.stdout }} "
@@ -67,6 +62,7 @@
   args:
     chdir: /u01/app
   register: rootloginfon2
+  when: inventory_hostname in groups['ora_x2']
 
 
 - debug:

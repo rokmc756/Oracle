@@ -13,17 +13,13 @@
   with_items:
     - gridsetup21c.rsp
 
-  # tags:
-  #  - gisoftinstall_cprspfile
-  #  - oracle-database-preinstall-21c-1.0-1.el7.x86_64.rpm
-
 
 - name: Copy Database Pre Install 21c RPM Pfile to the Target Database Server
   remote_user: "{{ root_user }}"
   copy: src={{ item.fn }} dest={{ item.dest }} owner=grid group=oinstall mode=0775
   with_items:
     - { dest: "{{ stage_dir }}" ,    fn: "oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm" }
-    - { dest: "{{ software_dir }}", fn: "LINUX.X64_213000_grid_home.zip" }
+    - { dest: "{{ software_dir }}",  fn: "LINUX.X64_213000_grid_home.zip" }
 
 
 - name: Unpack Oracle 21c GI Software
@@ -38,9 +34,6 @@
      owner="{{ grid_user }}"
      remote_src=yes
   when: inventory_hostname in groups['ora_x1']
-
-  # tags:
-  # - gisoftinstall_unpacksoft
 
 
 - name: Install CVU RPM from Local File

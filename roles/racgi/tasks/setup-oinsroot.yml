@@ -8,8 +8,6 @@
   remote_user: "{{ root_user }}"
   shell: /bin/sh "{{ ora_inventory }}/orainstRoot.sh"
   register: gisw_orainstroonode1
-  tags:
-    - gisoftinstall_exeorainsroot
   when: inventory_hostname in groups['ora_x1']
 
 
@@ -24,8 +22,6 @@
   remote_user: "{{ root_user }}"
   shell: /bin/sh "{{ ora_inventory }}/orainstRoot.sh"
   register: gisw_orainstroonode2
-  tags:
-    - gisoftinstall_exeorainsroot
   when: inventory_hostname in groups['ora_x2']
 
 

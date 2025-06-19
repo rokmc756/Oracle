@@ -3,8 +3,6 @@
 # Install NTP for Cluster
 # ------------------------------------------------------------------------------
 
-#- block:
-
 - name: Install NTP for Cluster
   yum:
     name: ntp
@@ -18,10 +16,4 @@
     state: started
     enabled: yes
   when: inventory_hostname in groups['dbservers']
-
-
-# tags:                 ntp
-# become:               yes
-# become_user:          root
-
 

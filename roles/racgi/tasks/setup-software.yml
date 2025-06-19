@@ -14,21 +14,21 @@
     {{ grid_home }}/gridSetup.sh -silent -ignorePrereqFailure -waitforcompletion \
     -skipStackCheck -responseFile {{ stage_dir }}/{{ gi_rspfile }} > /u02/stage/giinstalloutput.log
   register: racgisoft_install_result
-  # args:
-  #  warn: false # set warn=false to prevent warning
-  # no_log: false
   failed_when: racgisoft_install_result.rc != 6   #### This condition is based on my own setup
   when: inventory_hostname in groups['ora_x1']
   # no_log: true
-
+  # no_log: false
+  # args:
+  #  warn: false # set warn=false to prevent warning
+ 
 
 - name: Get the Output Log Status
   remote_user: "{{ root_user }}"
   become: yes
   become_user: oracle
-  when: inventory_hostname in groups['ora_x1']
   shell: grep -r "Successfully Setup Software with *" /u02/stage/giinstalloutput.log
   register: racgisoftinstall_log
+  when: inventory_hostname in groups['ora_x1']
 
 
 - name: Output from Post GI Software Installation Check

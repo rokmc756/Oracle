@@ -10,7 +10,5 @@
     mode=0775
   with_items:
     - "{{ oracle_base }}"
-  tags:
-    - gisoftinstall_credits
   when: inventory_hostname in groups['dbservers']
 
