@@ -28,7 +28,7 @@
 
 - name: Set Facts for Network and Packages Informations
   import_tasks: set-facts.yml
-  tags: prepare, install, uninstall, add, setup, execute, remove, validate, finalize, create, delete
+  tags: prepare, install, uninstall, add, setup, execute, remove, validate, finalize, create, delete, config
 
 
 - name: Modify OS Settings
@@ -46,6 +46,13 @@
 - name: Add Group and Users
   import_tasks: 00-add-users.yml
   tags: add
+  when: ( user is defined and user == true ) or ( racgi_all is defined and racgi_all == true )
+  # import_tasks: oracle-userngroup.yml
+
+
+- name: Delete Group and Users
+  import_tasks: 00-delete-users.yml
+  tags: delete
   when: ( user is defined and user == true ) or ( racgi_all is defined and racgi_all == true )
   # import_tasks: oracle-userngroup.yml
 

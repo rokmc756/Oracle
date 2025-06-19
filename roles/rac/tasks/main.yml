@@ -39,42 +39,42 @@
 #    - import_tasks: racdbsoft21c_installvalidate.yml
 
 
-- name: Add Groups and Users for Oracle Database Software ( RAC )
-  become:           yes
-  become_user:      root
-  import_tasks: 00-add-users.yml
-  tags: add, install
-  when: ( user is defined and user ==  true ) or ( rac_all is defined and rac_all == true )
+#- name: Add Groups and Users for Oracle Database Software ( RAC )
+#  become:           yes
+#  become_user:      root
+#  import_tasks: 00-add-users.yml
+#  tags: add, install
+#  when: ( user is defined and user ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Pre Install Oracle Database Software ( RAC )
   become:           yes
   become_user:      root
-  import_tasks: racdbsoft21c_presoftinstall.yml
-  tags: prepare, install
+  import_tasks: prepare-software.yml
+  tags: prepare
   when: ( software is defined and software ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Install Oracle Database Software ( RAC )
   become:           yes
   become_user:      root
-  import_tasks: racdbsoft21c_softinstall.yml
-  tags: setup, install
+  import_tasks: setup-software.yml
+  tags: setup
   when: ( software is defined and software ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Execute n1 Root.sh ( RAC )
   become:           yes
   become_user:      root
-  import_tasks: racdbsoft21c_exerootn1.yml
-  tags: execute, install
+  import_tasks: execute-rootn1.yml
+  tags: execute
   when: ( rootn1 is defined and rootn1 ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Execute n2 Root.sh ( RAC )
   become:           yes
   become_user:      root
-  import_tasks: racdbsoft21c_exerootn2.yml
+  import_tasks: execute-rootn2.yml
   tags: execute, install
   when: ( rootn2 is defined and rootn2 ==  true ) or ( rac_all is defined and rac_all == true )
 
@@ -83,7 +83,7 @@
   become:           yes
   become_user:      root
   tags: validate, install
-  import_tasks: racdbsoft21c_installvalidate.yml
+  import_tasks: validate-software.yml
   when: ( software is defined and software ==  true ) or ( rac_all is defined and rac_all == true )
 
 
@@ -105,13 +105,11 @@
 #      - 'Install of Oracle 21c Oracle RAC Database Software task is completed successfully in Silent Mode'
 
 
-- name: Delete Groups and Users for Oracle Database Software ( RAC )
-  become:           yes
-  become_user:      root
-  import_tasks: 00-delete-users.yml
-  tags: delete, uninstall
-  when: ( user is defined and user ==  true ) or ( rac_all is defined and rac_all == true )
-
-
+#- name: Delete Groups and Users for Oracle Database Software ( RAC )
+#  become:           yes
+#  become_user:      root
+#  import_tasks: 00-delete-users.yml
+#  tags: delete, uninstall
+#  when: ( user is defined and user ==  true ) or ( rac_all is defined and rac_all == true )
 
 

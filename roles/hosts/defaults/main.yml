@@ -4,9 +4,9 @@ rh_common_devel_pkgs: "git"
 # libxml2-python,s3cmd
 
 
-rh7_common_devel_pkgs: "make,perl,gcc,tcl,tk,libnl"
-rh8_common_devel_pkgs: "make,perl,gcc,tcl,tk,libnl3"
-rh9_common_devel_pkgs: "make,perl,gcc,tcl,tk,libnl3,python3-passlib"
+rh7_common_devel_pkgs: "make,perl,gcc,tcl,tk,libnl,ksh,compat-openssl10"
+rh8_common_devel_pkgs: "make,perl,gcc,tcl,tk,libnsl,libnl3,compat-openssl10,ksh"
+rh9_common_devel_pkgs: "make,perl,gcc,tcl,tk,libnsl,libnl3,compat-openssl10,ksh,python3-passlib"
 
 
 suse_common_pkgs: "firewalld,sshpass,cifs-utils,nfs-utils,lsof,glibc-devel,rpcbind,xfsprogs,kernel-devel,jq,expect,net-tools,ipvsadm,lvm2,docker,containerd,bind-utils,python3-passlib"

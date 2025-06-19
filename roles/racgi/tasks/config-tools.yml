@@ -10,12 +10,14 @@
   become: yes
   become_user: "{{ grid_user }}"
   shell: |
-    {{ grid_home }}/gridSetup.sh -silent -executeConfigTools \
-    -responseFile {{ stage_dir }}/{{ gi_rspfile }}
-  args:
-      warn: false # set warn=false to prevent warning
-  failed_when: racgi_configtools_result.rc != 255   #### This condition is based on my own setup
+    {{ grid_home }}/gridSetup.sh -silent -executeConfigTools -responseFile {{ stage_dir }}/{{ gi_rspfile }}
+  # args:
+  #    warn: false # set warn=false to prevent warning
+  # failed_when: racgi_configtools_result.rc != 255   #### This condition is based on my own setup
+  failed_when: racgi_configtools_result.rc != 0   #### This condition is based on my own setup
   register: racgi_configtools_result
+  when: inventory_hostname in groups['ora_x1']
+- debug: msg={{ racgi_configtools_result }}
   when: inventory_hostname in groups['ora_x1']
 
 
@@ -24,6 +26,8 @@
   shell: |
     grep -r "'UpdateNodeList' was successful *" {{ ora_inventory }}/logs/UpdateNodeList*.log
   register: configtools_log
+  when: inventory_hostname in groups['ora_x1']
+- debug: msg={{ configtools_log }}
   when: inventory_hostname in groups['ora_x1']
 
 

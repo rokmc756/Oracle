@@ -26,11 +26,12 @@
   become_user: "{{ oracle_user }}"
   shell: |
     "{{ oracle_home }}/runInstaller -ignorePrereq -waitforcompletion -silent -responseFile {{ stage_dir }}/{{ dbsoft21c_rsp }} > /u02/stage/dbinstalloutput.log"
-  args:
-      warn: false # set warn=false to prevent warning
-  # failed_when: racdbsoft_install_result.rc != 6   #### This condition is based on my own setup
+  # args:
+  #    warn: false # set warn=false to prevent warning
+  failed_when: racdbsoft_install_result.rc != 6   #### This condition is based on my own setup
   register: racdbsoft_install_result
-  no_log: true
+  no_log: false
+  # no_log: true
   when: inventory_hostname in groups['ora_x1']
   # when: inventory_hostname in groups['ora_x1'] and oracle_home not in dbsoft_install_check.stdout_lines
 

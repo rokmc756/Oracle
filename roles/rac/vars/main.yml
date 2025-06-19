@@ -22,6 +22,6 @@ OPER_GROUP:                      oper
 OSOTHERS_GROUP:                  oinstall
 NODES:                           ora-x1,ora-x2
 opatchenv:
-      ORACLE_HOME: "{{ oracle_home }}"
-      PATH: "{{ oracle_home}}/OPatch:$PATH:/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin"
+  ORACLE_HOME: "{{ oracle_home }}"
+  PATH: "{{ oracle_home}}/OPatch:$PATH:/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin"
 
