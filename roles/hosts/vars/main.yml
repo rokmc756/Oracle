@@ -8,6 +8,12 @@
 sudo_user: "oradmin"
 sudo_group: "oradmin"
 
+oracle_user: "oracle"
+oracle_user_pass: "changeme"
+
+grid_user: "oracle"
+grid_user_pass: "changeme"
+
 local_sudo_user: "jomoon"
 wheel_group: "wheel"            # RHEL / CentOS / Rocky / SUSE / OpenSUSE
 # wheel_group: "sudo"           # Debian / Ubuntu

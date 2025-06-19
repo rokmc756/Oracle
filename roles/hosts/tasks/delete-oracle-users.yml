@@ -1,0 +1,17 @@
+---
+- name: Delete Users Belonging to Oinstall Group and Install Groups
+  user:
+    name: "{{ item.user_name }}"
+    state: absent
+  with_items:
+    - { user_name: "grid" }
+    - { user_name: "oracle" }
+
+
+- name: Delete Groups
+  group:
+    name: "{{ item.group }}"
+    state: absent
+    gid: "{{ item.gid }}"
+  loop: "{{ _rac.install_group }}"
+

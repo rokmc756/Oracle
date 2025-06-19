@@ -50,13 +50,6 @@
   # import_tasks: oracle-userngroup.yml
 
 
-- name: Delete Group and Users
-  import_tasks: 00-delete-users.yml
-  tags: delete
-  when: ( user is defined and user == true ) or ( racgi_all is defined and racgi_all == true )
-  # import_tasks: oracle-userngroup.yml
-
-
 - name: Create Required Directories
   import_tasks: create-required-dirs.yml
   tags: create
@@ -115,6 +108,13 @@
     - "{{ stage_dir }}"
   tags: remove
   when: ( stage is defined and stage == true ) or ( racgi_all is defined and racgi_all == true )
+
+
+- name: Delete Group and Users
+  import_tasks: 00-delete-users.yml
+  tags: delete
+  when: ( user is defined and user == true ) or ( racgi_all is defined and racgi_all == true )
+  # import_tasks: oracle-userngroup.yml
 
 
 # - name: Display Post Install Message

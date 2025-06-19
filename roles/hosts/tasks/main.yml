@@ -36,6 +36,24 @@
   when: inventory_hostname in groups['servers']
 
 
+- name: Add Oracle Groups and Users
+  import_tasks: add-oracle-users.ynml
+  tags: init, install
+  when: inventory_hostname in groups['servers']
+
+
+- name: Create SSH Key and Exchange It for Oracle User among All Hosts
+  import_tasks: ssh_oracle_user.yml
+  tags: init, install
+  when: inventory_hostname in groups['servers']
+
+
+- name: Create SSH Key and Exchange It for Grid User among All Hosts
+  import_tasks: ssh_grid_user.yml
+  tags: init, install
+  when: inventory_hostname in groups['servers']
+
+
 - name: Uninstall SSH Keys and Sudo Users as well as Prerequiestes Software Packages
   import_tasks: uninstall.yml
   tags: uninit, uninstall

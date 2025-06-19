@@ -120,6 +120,7 @@
       ignore_errors: True
       changed_when: False
 
+
     - name: add user for grid
       shell: /usr/sbin/useradd -u 54331 -g oinstall -G dba,asmadmin,asmdba,asmoper,racdba grid
       changed_when: False
@@ -131,10 +132,12 @@
       ignore_errors: True
       changed_when: False
 
+
     - name: add user for oracle
       shell: /usr/sbin/useradd -u 54321 -g oinstall -G dba,backupdba,dgdba,kmdba,asmdba,oper,racdba,asmdba oracle
       changed_when: False
       when: result|failed
+
 
     - name: change password for grid
       user:

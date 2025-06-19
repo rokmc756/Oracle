@@ -46,6 +46,9 @@ _oracle:
     - { group: "dgdba",     gid: "1505" }
     - { group: "kmdba",     gid: "1506" }
     - { group: "racdba",    gid: "1507" }
+    - { group: "asmdba",    gid: "1508" }
+    - { group: "asmoper",   gid: "1509" }
+    - { group: "asmadmin",  gid: "1510" }
   ports:
     - { proto: "tcp",       port: "1521" }
     - { proto: "tcp",       port: "5500" }

@@ -14,14 +14,18 @@
 - name: Kill Processes Hold On User Directory
   become: true
   shell: |
-    {{ item }}{{ sudo_user }}
+    {{ item }}
     sleep 3
   register: kill_user_processes
   until: kill_user_processes is succeeded
-  retries: 10
+  retries: 5
   with_items:
-    - "nohup pkill -U "
-    - "nohup fuser -k /home/"
+    - "nohup pkill -U {{ sudo_user }}"
+    - "nohup fuser -k /home/{{ sudo_user }}"
+    - "nohup pkill -U {{ oracle_user }}"
+    - "nohup fuser -k /home/{{ oracle_user }}"
+    - "nohup pkill -U {{ grid_user }}"
+    - "nohup fuser -k /home/{{ grid_user }}"
 
 
 - name: Delete "{{ sudo_user }}" User and Group
@@ -31,13 +35,34 @@
     state: absent
 
 
+- name: Delete Users Belonging to Oinstall Group and Install Groups
+  user:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ oracle_user }}"
+    - "{{ grid_user }}"
+
+
+- name: Delete Groups
+  group:
+    name: "{{ item.group }}"
+    state: absent
+    gid: "{{ item.gid }}"
+  loop: "{{ _oracle.install_group }}"
+
+
 - name: Rollback Default Group to /etc/sudoers File
   become_user: root
   lineinfile:
     dest: /etc/sudoers
     state: absent
-    regexp: '^%{{ sudo_user }}'
-    line: '%{{ sudo_user }}  ALL=(ALL)        ALL'
+    regexp: '^%{{ item }}'
+    line: '%{{ item }}  ALL=(ALL)        ALL'
+  with_items:
+    - "{{ sudo_user }}"
+    - "{{ oracle_user }}"
+    - "{{ grid_user }}"
 
 
 - name: Remove bash_history and .ssh Directory
@@ -47,9 +72,15 @@
   with_items:
     - "/root/.bash_history"
     - "/home/{{ sudo_user }}/.bash_history"
+    - "/home/{{ oracle_user }}/.bash_history"
+    - "/home/{{ grid_user }}/.bash_history"
     - "/root/.ssh"
     - "/home/{{ sudo_user }}/.ssh"
+    - "/home/{{ oracle_user }}/.ssh"
+    - "/home/{{ grid_user }}/.ssh"
     - "/home/{{ sudo_user }}"
+    - "/home/{{ oracle_user }}"
+    - "/home/{{ grid_user }}"
 
 
 - name: Uninstall Prerequest Software Packages

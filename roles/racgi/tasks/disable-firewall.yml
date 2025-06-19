@@ -13,5 +13,5 @@
 
   become: yes
   become_user: root
-  tags: disable_firewall
+  # tags: disable_firewall
 
