@@ -1,0 +1,20 @@
+---
+- name: Remove iSCSI Disk Partition
+  parted:
+    device: "/dev/{{ item.iscsi_dev }}"
+    number: "1"
+    state: absent
+  register: delete_partition
+  with_items: "{{ _iscsi.target.disks }}"
+- debug: msg={{ delete_partition }}
+
+
+#- name: Uninstall Parted
+#  package:
+#    name: parted
+#    state: absent
+#  register: uninstall_parted
+#  ignore_errors: true
+#- debug: msg={{ uninstall_parted }}
+# command: cat /proc/partitions
+

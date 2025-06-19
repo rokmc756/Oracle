@@ -1,0 +1,19 @@
+---
+- name: Install Parted
+  package:
+    name: parted
+    state: present
+  register: install_parted
+- debug: msg={{ install_parted }}
+
+
+- name: "Add New Partition"
+  parted:
+    device: "/dev/{{ item.iscsi_dev }}"
+    number: 1
+    # flags: [ lvm ]
+    state: present
+  register: add_partition
+  with_items: "{{ _iscsi.target.disks }}"
+- debug: msg={{ add_partition }}
+

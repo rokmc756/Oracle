@@ -43,6 +43,30 @@
 #  when: (( multipath is defined and multipath == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
 
 
+- name: Create Partition
+  import_tasks: create-partition.yml
+  tags: create, install
+  when: (( partition is defined and partition == true ) or ( iscsi_all is defined and iscsi_all == true )) and ( inventory_hostname == "rk8-oracle03" )
+
+
+- name: Delete Partition
+  import_tasks: delete-partition.yml
+  tags: delete, uninstall
+  when: (( partition is defined and partition == true ) or ( iscsi_all is defined and iscsi_all == true )) and ( inventory_hostname == "rk8-oracle03" )
+
+
+- name: Configure UDEV
+  import_tasks: config-udev.yml
+  tags: config, install
+  when: (( udev is defined and udev == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
+
+
+- name: Remove UDEV
+  import_tasks: remove-udev.yml
+  tags: remove, uninstall
+  when: (( udev is defined and udev == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
+
+
 #- name: Disable Multipath
 #  import_tasks: mp/disable-multipath.yml
 #  tags: disable, remove, uninstall

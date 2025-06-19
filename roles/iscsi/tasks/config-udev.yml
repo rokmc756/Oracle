@@ -1,0 +1,38 @@
+---
+- name: Empty File
+  shell: |
+    echo "" > /lib/udev/rules.d/99-iscsidevices.rules
+  register: empty_file
+
+
+- name: Configure UDEV
+  shell:
+    cmd: |
+      ISCSI_ID=$(/lib/udev/scsi_id -g -u -d /dev/{{ item.iscsi_dev }})
+      cat << EOF >> /lib/udev/rules.d/99-iscsidevices.rules
+      KERNEL=="sd?1", SUBSYSTEM=="block", PROGRAM=="/lib/udev/scsi_id -g -u -d /dev/\$parent", RESULT=="$ISCSI_ID", SYMLINK+="rac/{{ item.rac_dev }}", OWNER="grid", GROUP="asmadmin", MODE="0660"
+      EOF
+  register: config_udev
+  with_items: "{{ _iscsi.target.disks }}"
+- debug: msg={{ config_udev }}
+
+
+- name: Test UDEV
+  shell: |
+    udevadm test /block/{{ item.iscsi_dev }}/{{ item.iscsi_dev }}1
+  register: test_udev
+  with_items: "{{ _iscsi.target.disks }}"
+  when: inventory_hostname == "rk8-oracle03"
+- debug: msg={{ test_udev }}
+  when: inventory_hostname == "rk8-oracle03"
+
+
+- name: Check UDEV
+  shell: |
+    ls -al /dev/rac
+  register: check_udev
+  when: inventory_hostname == "rk8-oracle03"
+- debug: msg={{ check_udev }}
+  when: inventory_hostname == "rk8-oracle03"
+
+

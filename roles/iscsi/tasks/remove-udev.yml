@@ -1,0 +1,8 @@
+---
+- name: Remove UDEV Config
+  file:
+    path: /lib/udev/rules.d/99-iscsidevices.rules
+    state: absent
+  register: remove_udev_config
+
+
