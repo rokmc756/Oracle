@@ -1,96 +1,57 @@
 
+### Key Oracle RAC Grid Administration Commands
+1. crsctl (Clusterware Control)
 
-### Check the status of Grid Infrastructure
+#### Status Checks
 ```bash
-su - grid
-
-crsctl status res -t
---------------------------------------------------------------------------------
-Name           Target  State        Server                   State details
---------------------------------------------------------------------------------
-Local Resources
---------------------------------------------------------------------------------
-ora.LISTENER.lsnr
-               ONLINE  ONLINE       rk8-oracle02             STABLE
-               ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.chad
-               ONLINE  ONLINE       rk8-oracle02             STABLE
-               ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.net1.network
-               ONLINE  ONLINE       rk8-oracle02             STABLE
-               ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.ons
-               ONLINE  ONLINE       rk8-oracle02             STABLE
-               ONLINE  ONLINE       rk8-oracle03             STABLE
---------------------------------------------------------------------------------
-Cluster Resources
---------------------------------------------------------------------------------
-ora.ASMNET1LSNR_ASM.lsnr(ora.asmgroup)
-      1        ONLINE  ONLINE       rk8-oracle02             STABLE
-      2        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.DATA.dg(ora.asmgroup)
-      1        ONLINE  ONLINE       rk8-oracle02             STABLE
-      2        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.LISTENER_SCAN1.lsnr
-      1        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.LISTENER_SCAN2.lsnr
-      1        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.LISTENER_SCAN3.lsnr
-      1        ONLINE  ONLINE       rk8-oracle02             STABLE
-ora.asm(ora.asmgroup)
-      1        ONLINE  ONLINE       rk8-oracle02             Started,STABLE
-      2        ONLINE  ONLINE       rk8-oracle03             Started,STABLE
-ora.asmnet1.asmnetwork(ora.asmgroup)
-      1        ONLINE  ONLINE       rk8-oracle02             STABLE
-      2        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.cdp1.cdp
-      1        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.cdp2.cdp
-      1        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.cdp3.cdp
-      1        ONLINE  ONLINE       rk8-oracle02             STABLE
-ora.cvu
-      1        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.qosmserver
-      1        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.rk8-oracle02.vip
-      1        ONLINE  ONLINE       rk8-oracle02             STABLE
-ora.rk8-oracle03.vip
-      1        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.scan1.vip
-      1        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.scan2.vip
-      1        ONLINE  ONLINE       rk8-oracle03             STABLE
-ora.scan3.vip
-      1        ONLINE  ONLINE       rk8-oracle02             STABLE
---------------------------------------------------------------------------------
+$ su - grid
+$ crsctl check crs                            # Checks the status of the entire Oracle Clusterware stack (upper and lower)
+$ crsctl check cluster                        # Checks the status of the upper stack (Oracle Clusterware)
+$ crsctl check cluster -all                   # Checks the status of the cluster on all nodes
+$ crsctl check cluster -n rk8-oracle02        # Checks the status of the cluster on a specific node
+$ crsctl status resource -t                   # Displays the status of cluster resources in a table format
+$ crsctl status server -f                     # Displays the status of cluster nodes and services
+$ olsnodes -n                                 # Lists cluster nodes with their node numbers
 ```
 
-### Check Disk Info Added
+#### Start/Stop Operations
 ```bash
-$ ocrcheck
-Status of Oracle Cluster Registry is as follows :
-         Version                  :          4
-         Total space (kbytes)     :     901284
-         Used space (kbytes)      :      84832
-         Available space (kbytes) :     816452
-         ID                       :  316362664
-         Device/File Name         :      +DATA
-                                    Device/File integrity check succeeded
-
-                                    Device/File not configured
-
-                                    Device/File not configured
-
-                                    Device/File not configured
-
-                                    Device/File not configured
-
-         Cluster registry integrity check succeeded
-
-         Logical corruption check bypassed due to non-privileged user
+$ sudo crsctl start crs                       # Starts the Oracle Clusterware stack on the local node
+$ sudo crsctl stop crs                        # Stops the Oracle Clusterware stack on the local node
+$ sudo crsctl start cluster -all              # Starts the Oracle Clusterware stack on all nodes
+$ sudo crsctl stop cluster -all               # Stops the Oracle Clusterware stack on all nodes
+$ sudo crsctl start cluster -n rk8-oracle02   # Starts the Oracle Clusterware stack on a specific node
+$ sudo crsctl stop cluster -n rk8-oracle02    # Stops the Oracle Clusterware stack on a specific node
+$ sudo crsctl disable has                     # Disables automatic startup of Oracle Clusterware on the local node
+$ sudo crsctl enable has                      # Enables automatic startup of Oracle Clusterware on the local node
 ```
 
+#### Other Operations
+```bash
+$ crsctl query css vote                       # Queries the voting disk information
+$ crsctl replace css vote                     # Replaces a voting disk
+$ ocrconfig -export <filename>                # Exports the Oracle Cluster Registry (OCR) configuration to a file
+$ ocrconfig -import <filename>                # Imports the OCR configuration from a file
+```
 
-crsctl stop res -all
+2. srvctl (Server Control):
+
+#### Database Management
+```bash
+$ srvctl start database -d <database_name>                           # Starts the specified RAC database
+$ srvctl stop database -d <database_name>                            # Stops the specified RAC database
+$ srvctl start instance -d <database_name> -i <instance_name>        # Starts a specific instance of the database
+$ srvctl stop instance -d <database_name> -i <instance_name>         # Stops a specific instance of the database
+$ srvctl status database -d <database_name>                          # Checks the status of the specified database
+$ srvctl status instance -d <database_name> -i <instance_name>       # Checks the status of the specified instance
+```
+
+#### Service Management:
+```bash
+$ srvctl add service -d <database_name> -s <service_name> -r <preferred_instance> -a <available_instances>       # Adds a new service to the database
+$ srvctl start service -d <database_name> -s <service_name>                                                      # Starts a specific service
+$ srvctl stop service -d <database_name> -s <service_name>                                                       # Stops a specific service
+$ srvctl status service -d <database_name> -s <service_name>                                                     # Checks the status of a specific service
+```
+
 
