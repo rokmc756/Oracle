@@ -1,6 +1,7 @@
 ---
 #======================================================================================
-# Summary Steps:
+#  Summary Steps:
+#======================================================================================
 # (1) Check if Binaries are Already Installed
 # (2) Create Required Directories
 # (3) Unpack Oracle 21c Database Software from the Local Drive
@@ -29,40 +30,40 @@
 
 
 - name: Pre Install Oracle RAC Database Software
-  become:           yes
-  become_user:      root
+  # become:           yes
+  # become_user:      root
   import_tasks: prepare-packages.yml
   tags: prepare
   when: ( pkgs is defined and pkgs ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Setup Oracle RAC Database Software
-  become:           yes
-  become_user:      root
+  # become:           yes
+  # become_user:      root
   import_tasks: setup-software.yml
   tags: setup
   when: ( software is defined and software ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Execute n1 Root.sh
-  become:           yes
-  become_user:      root
+  # become:           yes
+  # become_user:      root
   import_tasks: execute-rootn1.yml
   tags: execute
   when: ( rootn1 is defined and rootn1 ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Execute n2 Root.sh
-  become:           yes
-  become_user:      root
+  # become:           yes
+  # become_user:      root
   import_tasks: execute-rootn2.yml
   tags: execute
   when: ( rootn2 is defined and rootn2 ==  true ) or ( rac_all is defined and rac_all == true )
 
 
-- name: Valiate Oracle RAC Database Software Installed
-  become:           yes
-  become_user:      root
+- name: Verify Oracle RAC Database Software Installed
+  # become:           yes
+  # become_user:      root
   tags: verify
   import_tasks: verify-database.yml
   when: (( db is defined and db ==  true ) or ( rac_all is defined and rac_all == true )) and inventory_hostname in groups['dbservers']
@@ -75,7 +76,7 @@
     state: absent
   with_items:
     - "{{ stage_dir }}"
-  tags: remove, uninstall
+  tags: remove, install
   when: ( stage is defined and stage ==  true ) or ( rac_all is defined and rac_all == true )
 
 

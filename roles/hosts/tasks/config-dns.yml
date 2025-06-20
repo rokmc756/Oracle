@@ -1,0 +1,25 @@
+
+racdb01-scan.jtest.pivotal.io
+  - 192.168.2.237
+  - 192.168.2.238
+  - 192.168.2.239
+
+rk8-oracle01.jtest.pivotal.io
+  - 192.168.2.241
+
+rk8-oracle02.jtest.pivotal.io
+  - 192.168.2.242
+
+rk8-oracle03.jtest.pivotal.io
+  - 192.168.2.243
+
+
+rk8-oracle01-vip.jtest.pivotal.io
+  - 192.168.2.244
+
+rk8-oracle02-vip.jtest.pivotal.io
+  - 192.168.2.245
+
+rk8-oracle03-vip.jtest.pivotal.io
+  - 192.168.2.246
+

@@ -1,0 +1,38 @@
+---
+# =============================================================================
+# (1) Execute orainstRoot.sh Scripts
+# =============================================================================
+
+- name: Execute orainstroot.sh on the Primary Node
+  remote_user: "{{ root_user }}"
+  shell: |
+    {{ ora_inventory }}/orainstRoot.sh
+  args:
+    executable: /bin/bash
+  register: run_orainstroot_primary_node
+  when: inventory_hostname in groups['primary']
+
+
+- name: Output of orainstroot.sh from Primary Node
+  debug:
+    var: run_orainstroot_primary_node.stdout_lines
+    verbosity: 0
+  when: inventory_hostname in groups['primary']
+
+
+- name: Execute orainstroot.sh on Secondary Nodes
+  remote_user: "{{ root_user }}"
+  shell: |
+    {{ ora_inventory }}/orainstRoot.sh
+  args:
+    executable: /bin/bash
+  register: run_orainstroot_secondary_nodes
+  when: inventory_hostname in groups['secondary']
+
+
+- name: Output of orainstroot.sh from Node 2
+  debug:
+    var: run_orainstroot_secondary_nodes.stdout_lines
+    verbosity: 0
+  when: inventory_hostname in groups['secondary']
+

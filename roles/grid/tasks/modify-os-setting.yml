@@ -1,9 +1,8 @@
 ---
-# =============================================================================
-# Install Oracle GI 21.3 Software Only:
+#===========================================================================================
 # (1) Assumption: Oracle GI software is downloaded and staged
 # (2) modify settings for OS
-# =============================================================================
+#===========================================================================================
 
 - name: Change SELinux is Disable
   lineinfile: dest=/etc/selinux/config create=no insertafter=EOF line='SELINUX=disabled'

@@ -1,20 +1,19 @@
 ---
-# =============================================================================
-# Install Oracle GI 21.3.0 Software Only
+#===================================================================================================
 # (1) Assumption: Oracle GI software is Downloaded and Staged
 # (2) Install cluster verification utility
 # (3) Unpack Oracle GI software to the Oracle Home directory into the first node
 # (4) Run cluster Verification Checks for CRS Installation
-# =============================================================================
+#===================================================================================================
 
 - name: Copy Grid 21c Grid Software Response File to the Target Database Server
   remote_user: "{{ root_user }}"
-  copy: src=templates/{{ item }} dest={{ stage_dir }} owner=grid group=oinstall mode=0775
+  template: src={{ item }}.j2 dest={{ stage_dir }}/{{ item }} owner=grid group=oinstall mode=0775
   with_items:
     - gridsetup21c.rsp
 
 
-- name: Copy Database Pre Install 21c RPM Pfile to the Target Database Server
+- name: Copy Database Pre Install RPM files to the Target Database Server
   remote_user: "{{ root_user }}"
   copy: src={{ item.fn }} dest={{ item.dest }} owner=grid group=oinstall mode=0775
   with_items:
@@ -22,9 +21,8 @@
     - { dest: "{{ software_dir }}",  fn: "LINUX.X64_213000_grid_home.zip" }
 
 
-- name: Unpack Oracle 21c GI Software
+- name: Unpack Oracle Grid Infrastructure Software
   remote_user: "{{ root_user }}"
-  become: yes
   become_user: "{{ grid_user }}"
   unarchive:
      src={{ software_dir }}/LINUX.X64_213000_grid_home.zip
@@ -33,7 +31,7 @@
      group="{{ oracle_install_group }}"
      owner="{{ grid_user }}"
      remote_src=yes
-  when: inventory_hostname in groups['ora_x1']
+  when: inventory_hostname in groups['primary']
 
 
 - name: Install CVU RPM from Local File
@@ -41,16 +39,17 @@
     name: /u02/app/21.3.0/grid/cv/rpm/cvuqdisk-1.0.10-1.rpm
     state: present
     disable_gpg_check: yes
-  when: inventory_hostname in groups['ora_x1']
+  when: inventory_hostname in groups['primary']
 
 
-- name: Transfer CVU File from ora_x1 to ora_x2
+- name: Transfer CVU File from Primary to Secondary Nodes
   synchronize:
     src: /u02/app/21.3.0/grid/cv/rpm/cvuqdisk-1.0.10-1.rpm
     dest: /u02/stage/cvuqdisk-1.0.10-1.rpm
     mode: pull
-  delegate_to: rk8-oracle03
-  when: inventory_hostname in groups['ora_x1']
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['secondary'] }}"
+  when: inventory_hostname in groups['primary']
 
 
 - name: Install CVU RPM from Local File
@@ -58,16 +57,17 @@
     name: /u02/stage/cvuqdisk-1.0.10-1.rpm
     state: present
     disable_gpg_check: yes
-  when: inventory_hostname in groups['ora_x2']
+  when: inventory_hostname in groups['secondary']
 
 
 - name: Run Cluster Verification Checks for CRS Installation
-  become: yes
-  become_user: grid
+  become_user: "{{ grid_user }}"
   shell: |
-    {{ grid_home}}/runcluvfy.sh stage -post crsinst -n "ora_x1,ora_x2" -verbose
+    {{ grid_home}}/runcluvfy.sh stage -post crsinst -n "rk8-oracle01,rk8-oracle02,rk8-oracle03" -verbose
   register:           cluvfy_stage_pre_crsinst
   failed_when:        false
   no_log:             true
-  when: inventory_hostname in groups['ora_x1']
+  when: inventory_hostname in groups['primary']
+- debug: msg={{ cluvfy_stage_pre_crsinst }}
+  when: inventory_hostname in groups['primary']
 

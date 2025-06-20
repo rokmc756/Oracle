@@ -7,16 +7,23 @@ remote_machine_password="changeme"
 [ora_x1]
 rk8-oracle02        ansible_ssh_host=192.168.2.242
 
-
 [ora_x2]
 rk8-oracle03        ansible_ssh_host=192.168.2.243
 
 
-[oel75]
-rk8-oracle01        ansible_ssh_host=192.168.2.241
+[primary]
+rk8-oracle01    ansible_ssh_host=192.168.2.241   ora_xid=1
+
+
+[secondary]
+rk8-oracle02    ansible_ssh_host=192.168.2.242   ora_xid=2
+rk8-oracle03    ansible_ssh_host=192.168.2.243   ora_xid=3
+
 
 
 [dbservers]
-rk8-oracle02        ansible_ssh_host=192.168.2.242
-rk8-oracle03        ansible_ssh_host=192.168.2.243
+rk8-oracle01    ansible_ssh_host=192.168.2.241   ora_xid=1
+rk8-oracle02    ansible_ssh_host=192.168.2.242   ora_xid=2
+rk8-oracle03    ansible_ssh_host=192.168.2.243   ora_xid=3
+
 

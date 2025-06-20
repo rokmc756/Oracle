@@ -28,68 +28,62 @@
   debug:
     msg:
       - 'This playbook is for installing Oracle RAC GI software 21c , started at {{ansible_date_time.iso8601}}:'
-  tags: pre
-  when: ( msg is defined and msg == true ) or ( racgi_all is defined and racgi_all == true )
+  tags: pre, install
+  when: ( msg is defined and msg == true ) or ( grid_all is defined and grid_all == true )
 
 
 - name: Modify OS Settings
   import_tasks: modify-os-setting.yml
-  tags: prepare
-  when: ( os is defined and os == true ) or ( racgi_all is defined and racgi_all == true )
-
-
-#- name: Modify Oracle Settings
-#  import_tasks: modify-oracle-setting.yml
-#  tags: prepare
-#  when: ( oracle is defined and oracle == true ) or ( racgi_all is defined and racgi_all == true )
+  tags: prepare, install
+  when: ( os is defined and os == true ) or ( grid_all is defined and grid_all == true )
 
 
 - name: Create Required Directories
   import_tasks: create-required-dirs.yml
-  tags: create
-  when: ( dir is defined and dir == true ) or ( racgi_all is defined and racgi_all == true )
+  tags: create, install
+  when: ( dir is defined and dir == true ) or ( grid_all is defined and grid_all == true )
 
 
 - name: Setup NTP Server
   import_tasks: setup-chrony.yml
-  tags: setup
-  when: ( ntp is defined and ntp == true ) or ( racgi_all is defined and racgi_all == true )
+  tags: setup, install
+  when: ( ntp is defined and ntp == true ) or ( grid_all is defined and grid_all == true )
 
 
 - name: Prepare Oracle Grid Infrastructure Software
   import_tasks: prepare-software.yml
-  tags: prepare
-  when: (( software is defined and software == true ) or ( racgi_all is defined and racgi_all == true )) and inventory_hostname in groups['dbservers']
+  tags: prepare, install
+  when: (( software is defined and software == true ) or ( grid_all is defined and grid_all == true )) and inventory_hostname in groups['dbservers']
 
 
 - name: Setup Oracle Grid Infraintrastructure Software
   import_tasks: setup-software.yml
-  tags: setup
-  when: ( software is defined and software == true ) or ( racgi_all is defined and racgi_all == true )
+  tags: setup, install
+  when: ( software is defined and software == true ) or ( grid_all is defined and grid_all == true )
 
 
 - name: Execute orainstRoot.sh
   import_tasks: execute-orainst-root.yml
-  tags: execute
-  when: ( oraintsroot is defined and orainstroot == true ) or ( racgi_all is defined and racgi_all == true )
+  tags: execute, install
+  when: ( orainstroot is defined and orainstroot == true ) or ( grid_all is defined and grid_all == true )
 
 
 - name: Execute root.sh
   import_tasks: execute-root-sh.yml
-  tags: execute
-  when: ( root is defined and root == true ) or ( racgi_all is defined and racgi_all == true )
+  tags: execute, install
+  when: ( root is defined and root == true ) or ( grid_all is defined and grid_all == true )
 
 
 - name: Post Oracle Grid Infrastructure Installation Tasks
   import_tasks: config-tools.yml
-  tags: config
-  when: ( tools is defined and tools == true ) or ( racgi_all is defined and racgi_all == true )
+  tags: config, install
+  when: ( tools is defined and tools == true ) or ( grid_all is defined and grid_all == true )
 
 
 - name: Verify Oracle Grid Cluster
   import_tasks: verify-cluster.yml
-  tags: verify
-  when: ( cluster is defined and cluster == true ) or ( racgi_all is defined and racgi_all == true )
+  tags: verify, install
+  when: ( cluster is defined and cluster == true ) or ( grid_all is defined and grid_all == true )
 
 
 - name: Delete Stage Directory
@@ -99,16 +93,16 @@
     state: absent
   with_items:
     - "{{ stage_dir }}"
-  tags: delete
-  when: ( stage is defined and stage == true ) or ( racgi_all is defined and racgi_all == true )
+  tags: delete, install
+  when: ( stage is defined and stage == true ) or ( grid_all is defined and grid_all == true )
 
 
 - name: Display Post Install Message
   debug:
     msg:
       - 'This Steps completed below task for Single Instance at {{ansible_date_time.iso8601}}:'
-      - '- Install Oracle Grid Infrastructure 21c on two node RAC cluster ora_x1 and ora_x2'
+      - '- Install Oracle Grid Infrastructure 21c on two node RAC cluster rk8-oracle01 and rk8-oracle02 and rk8-oracle03'
       - '- END OF ALL: git repository GI_21cSoftInstall will be shared'
-  tags: post
-  when: ( msg is defined and msg == true ) or ( racgi_all is defined and racgi_all == true )
+  tags: post, install
+  when: ( msg is defined and msg == true ) or ( grid_all is defined and grid_all == true )
 
