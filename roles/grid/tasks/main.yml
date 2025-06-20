@@ -32,6 +32,12 @@
   when: ( msg is defined and msg == true ) or ( grid_all is defined and grid_all == true )
 
 
+- name: Create Oracle Data Partitions
+  import_tasks: ext/create-data-dir.yml
+  tags: create, install
+  when: ( partition is defined and partition == true )
+
+
 - name: Modify OS Settings
   import_tasks: modify-os-setting.yml
   tags: prepare, install
@@ -108,6 +114,12 @@
   import_tasks: destroy-grid-service.yml
   tags: destroy, uninstall
   when: ( service is defined and service == true ) or ( grid_all is defined and grid_all == true )
+
+
+- name: Delete Oracle Data Partitions
+  import_tasks: ext/delete-data-dir.yml
+  tags: delete, uninstall
+  when: ( partition is defined and partition == true )
 
 
 - name: Display Post Install Message

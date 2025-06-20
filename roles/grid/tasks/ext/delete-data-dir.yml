@@ -1,0 +1,29 @@
+---
+- name: Unmount Partitions
+  mount:
+    path: "{{ item.mount_dir }}"
+    state: absent
+    # state: unmounted
+  register: unmount_points
+  with_items: "{{ _oracle.data.parts }}"
+- debug: msg={{ unmount_points }}
+
+
+- name: Delete Mount Points
+  file:
+    path: "{{ item.mount_dir }}"
+    state: absent
+  register: delete_mount_points
+  with_items: "{{ _oracle.data.parts }}"
+- debug: msg={{ delete_mount_points }}
+
+
+- name: Remove Disk Partitions
+  parted:
+    device: "/dev/{{ _oracle.data.disk }}{{ item.num }}"
+    number: "{{ item.num }}"
+    state: absent
+  register: delete_partition
+  with_items: "{{ _oracle.data.parts }}"
+- debug: msg={{ delete_partition }}
+

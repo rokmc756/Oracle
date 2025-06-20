@@ -1,0 +1,60 @@
+---
+- name: Install Parted
+  package:
+    name: parted
+    state: present
+  register: install_parted
+- debug: msg={{ install_parted }}
+
+
+- name: Gather Disk Information
+  parted:
+    device: "/dev/{{ _oracle.data.disk }}"
+    state: info
+  register: disk_info
+
+
+- name: Create Multiple Partitions
+  parted:
+    device: "/dev/{{ _oracle.data.disk }}"
+    number: "{{ item.num }}"
+    state: present
+    part_start: "{{ item.start }}"
+    part_end: "{{ item.end }}"
+    part_type: "{{ item.type | default('primary') }}"
+    label: gpt
+  register: add_partition
+  with_items: "{{ _oracle.data.parts }}"
+- debug: msg={{ add_partition }}
+
+
+- name: Format Partitions
+  filesystem:
+    fstype: xfs
+    dev: "/dev/{{ _oracle.data.disk }}{{ item.num }}"
+    state: present
+  register: format_partition
+  with_items: "{{ _oracle.data.parts }}"
+- debug: msg={{ format_partition }}
+
+
+- name: Create Mount Points
+  file:
+    path: "{{ item.mount_dir }}"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: 0755
+  register: create_mount_points
+  with_items: "{{ _oracle.data.parts }}"
+
+
+- name: Mount Partitions
+  mount:
+    path: "{{ item.mount_dir }}"
+    src: "/dev/{{ _oracle.data.disk }}{{ item.num }}"
+    fstype: xfs
+    state: mounted
+  register: create_mount_points
+  with_items: "{{ _oracle.data.parts }}"
+
