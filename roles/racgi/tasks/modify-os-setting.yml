@@ -25,3 +25,10 @@
   shell: systemctl stop chronyd
 
 
+- name: Backup /etc/hosts
+  shell: cp -p /etc/hosts /etc/hosts.`date +%Y%m%d`
+
+
+- name: Backup /etc/sysctl.conf
+  shell: cp -p /etc/sysctl.conf /etc/sysctl.conf.`date +%Y%m%d%H%M%S`
+

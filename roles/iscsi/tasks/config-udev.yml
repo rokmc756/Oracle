@@ -1,8 +1,9 @@
 ---
-- name: Empty File
-  shell: |
-    echo "" > /lib/udev/rules.d/99-iscsidevices.rules
-  register: empty_file
+- name: Delete UDEV Config File
+  file:
+    path: /lib/udev/rules.d/99-iscsidevices.rules
+    state: absent
+  register: delete_udev_config_file
 
 
 - name: Configure UDEV

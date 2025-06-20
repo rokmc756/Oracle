@@ -1,8 +1,7 @@
 ---
 # =============================================================================
-# Install Oracle GI 21.3.0 Software Only:
 # (1) Add oratab entry for ASM instances
-# (2) Validate Oracle GI cluster resources 
+# (2) Validate Oracle GI Cluster Resources
 # =============================================================================
 
 - name: Add Oratab Entry to First Node
@@ -82,4 +81,8 @@
       export ORACLE_BASE="{{ grid_base }}"
       export ORACLE_HOME="{{ grid_home }}"
       export PATH=$ORACLE_HOME/bin:$PATH
+      alias sqlss='sqlplus / as sysdba'
+      alias chob="cd ${ORACLE_BASE}"
+      alias choh="cd ${ORACLE_HOME}"
+
 

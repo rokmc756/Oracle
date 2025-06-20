@@ -6,7 +6,7 @@
 
 - name: Set Facts for Network and Packages Informations
   import_tasks: set-facts.yml
-  tags: install, uninstall, setup, remove, enable, disable, create, delete, reboot, test
+  tags: install, uninstall, setup, remove, enable, disable, create, delete, reboot, verify
 
 
 - name: Disable Firewalld
@@ -55,11 +55,6 @@
   when: (( partition is defined and partition == true ) or ( iscsi_all is defined and iscsi_all == true )) and ( inventory_hostname == "rk8-oracle03" )
 
 
-- name: Delete Partition
-  import_tasks: delete-partition.yml
-  tags: delete, uninstall
-  when: (( partition is defined and partition == true ) or ( iscsi_all is defined and iscsi_all == true )) and ( inventory_hostname == "rk8-oracle03" )
-
 
 - name: Configure UDEV
   import_tasks: config-udev.yml
@@ -67,17 +62,22 @@
   when: (( udev is defined and udev == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
 
 
-- name: Test UDEV
-  import_tasks: test-udev.yml
-  tags: test, install
+- name: Verify UDEV
+  import_tasks: verify-udev.yml
+  tags: verify, install
   when: (( udev is defined and udev == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
+
+
+- name: Delete Partition
+  import_tasks: delete-partition.yml
+  tags: delete, uninstall
+  when: (( partition is defined and partition == true ) or ( iscsi_all is defined and iscsi_all == true )) and ( inventory_hostname == "rk8-oracle03" )
 
 
 - name: Remove UDEV
   import_tasks: remove-udev.yml
   tags: remove, uninstall
   when: (( udev is defined and udev == true ) or ( iscsi_all is defined and iscsi_all == true )) and inventory_hostname in groups['servers']
-
 
 
 - name: Uninstall iSCSI Initiator

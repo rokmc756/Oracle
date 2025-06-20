@@ -27,4 +27,6 @@
       export ORACLE_BASE="{{ grid_base }}"
       export ORACLE_HOME="{{ grid_home }}"
       export PATH=$ORACLE_HOME/bin:$PATH
-
+      alias sqlss='sqlplus / as sysdba'
+      alias chob="cd ${ORACLE_BASE}"
+      alias choh="cd ${ORACLE_HOME}"

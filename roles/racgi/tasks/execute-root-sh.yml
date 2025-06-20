@@ -7,15 +7,23 @@
 - name: Execute root.sh on the First Node
   remote_user: "{{ root_user }}"
   become: yes
-  shell: "{{ grid_home }}/root.sh"
+  shell: |
+    {{ grid_home }}/root.sh
+  args:
+    executable: /bin/bash
   register: rootnode1
   when: inventory_hostname in groups['ora_x1']
+  # shell: "{{ grid_home }}/root.sh"
 
 
 - name: Get the Logfile Name on the First Node
   remote_user: "{{ root_user }}"
   become: yes
-  shell: "echo {{ rootnode1.stdout }} | grep -oP '(?<=Check).*?(?=for)' "
+  # shell: "echo {{ rootnode1.stdout }} | grep -oP '(?<=Check).*?(?=for)' "
+  shell: |
+    echo {{ rootnode1.stdout }} | grep -oP '(?<=Check).*?(?=for)'
+  args:
+    executable: /bin/bash
   register: logfile
   when: inventory_hostname in groups['ora_x1']
 
@@ -23,11 +31,14 @@
 - name: Get the Logfile Information on the First Node
   remote_user: "{{ root_user }}"
   become: yes
-  shell: "cat {{ logfile.stdout }} "
+  # shell: "cat {{ logfile.stdout }} "
+  shell: |
+    cat {{ logfile.stdout }}
+  args:
+    executable: /bin/bash
+    chdir: /u01/app
   with_items:
     - logino.log
-  args:
-    chdir: /u01/app
   register: rootloginfon1
   when: inventory_hostname in groups['ora_x1']
 
@@ -40,7 +51,11 @@
 - name: Execute root.sh on the Second Node
   remote_user: "{{ root_user }}"
   become: yes
-  shell: "{{ grid_home }}/root.sh"
+  # shell: "{{ grid_home }}/root.sh"
+  shell: |
+    {{ grid_home }}/root.sh
+  args:
+    executable: /bin/bash
   register: rootnode2
   when: inventory_hostname in groups['ora_x2'] 
 
@@ -48,7 +63,11 @@
 - name: Get the Logfile Information on the Second Node
   remote_user: "{{ root_user }}"
   become: yes
-  shell: "echo {{ rootnode2.stdout }} | grep -oP '(?<=Check).*?(?=for)' "
+  # shell: "echo {{ rootnode2.stdout }} | grep -oP '(?<=Check).*?(?=for)' "
+  shell: |
+    echo {{ rootnode2.stdout }} | grep -oP '(?<=Check).*?(?=for)'
+  args:
+    executable: /bin/bash
   register: logfile
   when: inventory_hostname in groups['ora_x2']
 
@@ -56,13 +75,16 @@
 - name: Get the logfile Information on the Second Node
   remote_user: "{{ root_user }}"
   become: yes
-  shell: "cat {{ logfile.stdout }} "
+  shell: |
+    cat {{ logfile.stdout }}
   with_items:
     - logino.log
   args:
     chdir: /u01/app
+    executable: /bin/bash
   register: rootloginfon2
   when: inventory_hostname in groups['ora_x2']
+  # shell: "cat {{ logfile.stdout }} "
 
 
 - debug:

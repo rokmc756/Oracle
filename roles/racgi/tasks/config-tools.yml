@@ -1,11 +1,10 @@
 ---
 # =============================================================================
-# Install Oracle GI 21.3.0 Software Only:
 # (1) Install Oracle GI 21.3.0 executeConfigTools in Silent Mode
 # (2) Validate output logs 
 # =============================================================================
 
-- name: Install Oracle 21c Grid Infrastructure ConfigTools in Silent Mode
+- name: Setup Oracle 21c Grid Infrastructure ConfigTools in Silent Mode
   remote_user: "{{ root_user }}"
   become: yes
   become_user: "{{ grid_user }}"
@@ -16,9 +15,9 @@
   when: inventory_hostname in groups['ora_x1']
 - debug: msg={{ racgi_configtools_result }}
   when: inventory_hostname in groups['ora_x1']
-  # args:
-  #    warn: false # set warn=false to prevent warning
-  # failed_when: racgi_configtools_result.rc != 255   #### This condition is based on my own setup
+# args:
+#   warn: false # set warn=false to prevent warning
+# failed_when: racgi_configtools_result.rc != 255   #### This condition is based on my own setup
 
 
 - name: Get the Log Information
@@ -33,4 +32,5 @@
 
 - debug: var=configtools_log.stdout_lines
   when: inventory_hostname in groups['ora_x1']
+
 

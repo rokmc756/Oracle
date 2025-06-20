@@ -1,7 +1,7 @@
 ---
 # =============================================================================
-# Install Oracle GI 21.3.0 Software Only:
-# (1) Assumption: Oracle GI software is downloaded and staged
+# Install Oracle GI 21.3.0 Software Only
+# (1) Assumption: Oracle GI software is Downloaded and Staged
 # (2) Install cluster verification utility
 # (3) Unpack Oracle GI software to the Oracle Home directory into the first node
 # (4) Run cluster Verification Checks for CRS Installation

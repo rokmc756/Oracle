@@ -1,5 +1,5 @@
 ---
-- name: Test UDEV
+- name: Verify UDEV
   shell: |
     udevadm test /block/{{ item.iscsi_dev }}/{{ item.iscsi_dev }}1
   register: test_udev

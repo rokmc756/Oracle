@@ -50,8 +50,8 @@ mgt_Option: NONE
 oms_Port: 0
 execute_RootScript: false
 asmdiskpre: /dev/oracleasm/disks/ASM_DISK0
-disksWthFailGrp: '{{ asmdiskpre }}1,,{{ asmdiskpre }}2,,{{ asmdiskpre }}3,,{{ asmdiskpre }}4,,{{ asmdiskpre }}5,,{{ asmdiskpre }}6,'   
-asmdiskGroupdisks: '{{ asmdiskpre }}1,{{ asmdiskpre }}2,{{ asmdiskpre }}3,{{ asmdiskpre }}4,{{ asmdiskpre }}5,{{ asmdiskpre }}6'   
+disksWthFailGrp: '{{ asmdiskpre }}1,,{{ asmdiskpre }}2,,{{ asmdiskpre }}3,,{{ asmdiskpre }}4,,{{ asmdiskpre }}5,,{{ asmdiskpre }}6,'
+asmdiskGroupdisks: '{{ asmdiskpre }}1,{{ asmdiskpre }}2,{{ asmdiskpre }}3,{{ asmdiskpre }}4,{{ asmdiskpre }}5,{{ asmdiskpre }}6'
 dg_au: 1
 asmdiskDiscoveryString: "/dev/oracleasm/disks"
 disk_discstr: "/dev/oracleasm/disks/*"

@@ -1,16 +1,14 @@
 ---
-# =====================================================================================
-# Install Oracle Database 21.3.0 Software for RAC using Ansible:
-# Summary Steps: 
+#======================================================================================
+# Summary Steps:
 # (1) Check if Binaries are Already Installed
-# (2) Create required directories
-# (3) Unpack Oracle 21c Database Software from the local drive
-# (4) Create silent response file from template
+# (2) Create Required Directories
+# (3) Unpack Oracle 21c Database Software from the Local Drive
+# (4) Create Silent Response File from Template
 # (5) Install Oracle 21c Database Software for RAC
-# (6) Execute root.sh on primary node and then other nodes
-# (7) Remove stage directory
-# =====================================================================================
-
+# (6) Execute root.sh on Primary Node and then Other Nodes
+# (7) Remove Stage Directory
+#======================================================================================
 
 - name: Check OS ( Oracle )
   fail: msg="Not a Red Hat based system!"
@@ -19,43 +17,26 @@
 
 - name: Set Facts for Network and Packages Informations
   import_tasks: set-facts.yml
-  tags: prepare, install, uninstall, add, setup, execute, remove, validate
+  tags: pre, post, prepare, install, uninstall, add, setup, execute, remove, validate
 
 
-#- name: Display Pre Installation of Database Software Message
-#  debug:
-#    msg:
-#      - 'This playbook is for installing Oracle RAC database software 21c at {{ansible_date_time.iso8601}}:'
+- name: Display Pre Installation of Database Software Message
+  debug:
+    msg:
+      - 'This Playbook is for Installing Oracle RAC Database Software 21c at {{ ansible_date_time.iso8601 }}:'
+  tags: pre
+  when: ( msg is defined and msg ==  true ) or ( rac_all is defined and rac_all == true )
 
 
-#- name: Install Oracle Database Software (RAC) using Ansible
-#  become:           yes
-#  become_user:      root
-#  block:
-#    - import_tasks: racdbsoft21c_presoftinstall.yml
-#    - import_tasks: racdbsoft21c_softinstall.yml
-#    - import_tasks: racdbsoft21c_exerootn1.yml
-#    - import_tasks: racdbsoft21c_exerootn2.yml
-#    - import_tasks: racdbsoft21c_installvalidate.yml
-
-
-#- name: Add Groups and Users for Oracle Database Software ( RAC )
-#  become:           yes
-#  become_user:      root
-#  import_tasks: 00-add-users.yml
-#  tags: add, install
-#  when: ( user is defined and user ==  true ) or ( rac_all is defined and rac_all == true )
-
-
-- name: Pre Install Oracle Database Software ( RAC )
+- name: Pre Install Oracle RAC Database Software
   become:           yes
   become_user:      root
-  import_tasks: prepare-software.yml
+  import_tasks: prepare-packages.yml
   tags: prepare
-  when: ( software is defined and software ==  true ) or ( rac_all is defined and rac_all == true )
+  when: ( pkgs is defined and pkgs ==  true ) or ( rac_all is defined and rac_all == true )
 
 
-- name: Install Oracle Database Software ( RAC )
+- name: Setup Oracle RAC Database Software
   become:           yes
   become_user:      root
   import_tasks: setup-software.yml
@@ -63,7 +44,7 @@
   when: ( software is defined and software ==  true ) or ( rac_all is defined and rac_all == true )
 
 
-- name: Execute n1 Root.sh ( RAC )
+- name: Execute n1 Root.sh
   become:           yes
   become_user:      root
   import_tasks: execute-rootn1.yml
@@ -71,20 +52,20 @@
   when: ( rootn1 is defined and rootn1 ==  true ) or ( rac_all is defined and rac_all == true )
 
 
-- name: Execute n2 Root.sh ( RAC )
+- name: Execute n2 Root.sh
   become:           yes
   become_user:      root
   import_tasks: execute-rootn2.yml
-  tags: execute, install
+  tags: execute
   when: ( rootn2 is defined and rootn2 ==  true ) or ( rac_all is defined and rac_all == true )
 
 
-- name: Valiate Oracle Database Software Installed ( RAC )
+- name: Valiate Oracle RAC Database Software Installed
   become:           yes
   become_user:      root
-  tags: validate, install
-  import_tasks: validate-software.yml
-  when: ( software is defined and software ==  true ) or ( rac_all is defined and rac_all == true )
+  tags: verify
+  import_tasks: verify-database.yml
+  when: (( db is defined and db ==  true ) or ( rac_all is defined and rac_all == true )) and inventory_hostname in groups['dbservers']
 
 
 - name: Remove Stage Directory
@@ -98,18 +79,11 @@
   when: ( stage is defined and stage ==  true ) or ( rac_all is defined and rac_all == true )
 
 
-#- name: Display Post Install Message
-#  debug:
-#    msg:
-#      - 'This Steps completed below task for RAC database at {{ansible_date_time.iso8601}}:'
-#      - 'Install of Oracle 21c Oracle RAC Database Software task is completed successfully in Silent Mode'
-
-
-#- name: Delete Groups and Users for Oracle Database Software ( RAC )
-#  become:           yes
-#  become_user:      root
-#  import_tasks: 00-delete-users.yml
-#  tags: delete, uninstall
-#  when: ( user is defined and user ==  true ) or ( rac_all is defined and rac_all == true )
-
+- name: Display Post Install Message
+  debug:
+    msg:
+      - 'This Steps completed below task for RAC database at {{ansible_date_time.iso8601}}:'
+      - 'Install of Oracle 21c Oracle RAC Database Software task is completed successfully in Silent Mode'
+  tags: post
+  when: ( msg is defined and msg ==  true ) or ( rac_all is defined and rac_all == true )
 

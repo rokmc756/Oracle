@@ -1,6 +1,5 @@
 ---
 #======== =============================================================================
-# Install Oracle RAC DB 21.3.0 Software Only:
 # Assumption: 
 #  -  Oracle database pre install rpm downloaded
 #  -  Oracle Database software is downloaded and staged

@@ -1,12 +1,11 @@
 ---
 # =============================================================================
-# Install Oracle GI 21.3.0 Software Only:
 # (1) Install Oracle GI 21.3.0 Software Only in Silent Mode
 # (2) Validate output logs 
 # =============================================================================
 
 
-- name: Install Oracle 21c Grid Infrastructure Software
+- name: Setup Oracle 21c Grid Infrastructure Software
   remote_user: "{{ root_user }}"
   become: yes
   become_user: "{{ grid_user }}"
@@ -20,7 +19,7 @@
   # no_log: false
   # args:
   #  warn: false # set warn=false to prevent warning
- 
+
 
 - name: Get the Output Log Status
   remote_user: "{{ root_user }}"
@@ -36,5 +35,4 @@
     var: racgisoftinstall_log.stdout
     verbosity: 0
   when: inventory_hostname in groups['ora_x1'] and "'Successfully Setup Software.' or 'Successfully Setup Software with warning(s).' in racgisoftinstall_log.stdout"
-
 
