@@ -1,3 +1,5 @@
 
 # rm -rf /etc/oratab /etc/oraInst.loc /etc/oracle.ahf.loc
 
+/etc/oracle/olr.loc, /etc/oracle/ocr.loc
+, or CRS directories:

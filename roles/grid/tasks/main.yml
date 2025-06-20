@@ -21,7 +21,7 @@
 
 - name: Set Facts for Network and Packages Informations
   import_tasks: set-facts.yml
-  tags: prepare, install, uninstall, add, setup, execute, remove, validate, finalize, create, delete, config, modify, pre, post
+  tags: deploy, destroy, prepare, install, uninstall, add, setup, execute, remove, validate, finalize, create, delete, config, modify, pre, post
 
 
 - name: Display Pre Installation of Oracle Grid Infrastructure Software Message
@@ -93,8 +93,21 @@
     state: absent
   with_items:
     - "{{ stage_dir }}"
+    - "/u01/stage/LINUX.X64_213000_grid_home.zip"
   tags: delete, install
   when: ( stage is defined and stage == true ) or ( grid_all is defined and grid_all == true )
+
+
+- name: Delete Oracle Grid Config
+  import_tasks: ext/delete-grid-config.yml
+  tags: delete, remove
+  when: ( config is defined and config == true )
+
+
+- name: Destroy Oracle Grid Service
+  import_tasks: destroy-grid-service.yml
+  tags: destroy, uninstall
+  when: ( service is defined and service == true ) or ( grid_all is defined and grid_all == true )
 
 
 - name: Display Post Install Message

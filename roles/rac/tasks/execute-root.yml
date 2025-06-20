@@ -1,0 +1,44 @@
+---
+# =============================================================================
+# (1) Execute root.sh scripts on All Nodes
+# =============================================================================
+- name: Execute root.sh
+  remote_user: "{{ root_user }}"
+  shell: |
+    {{ oracle_home }}/root.sh -silent > {{ stage_dir }}/dbsoftinstallroot.log
+  register: racdbrootlog
+  # tags:
+  #  - db19c_exeroot
+  when: inventory_hostname in groups['dbservers']
+
+
+- name: Output Log File Name
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  shell: |
+    cat {{ stage_dir }}/dbsoftinstallroot.log | awk -v FS="(Check|for)" '{print $2}'
+  register: loginfo
+  when: inventory_hostname in groups['dbservers']
+
+
+- set_fact:
+    loginfo={{ loginfo.stdout }}
+  when: inventory_hostname in groups['dbservers']
+  # when: inventory_hostname in groups['ora_x1']
+
+
+- name: Get root.sh Output for All Nodes
+  shell: |
+    cat {{ loginfo }}
+  register: logdata
+  when: inventory_hostname in groups['dbservers']
+  # when: inventory_hostname in groups['ora_x1']
+
+
+- debug:
+    msg: "{{ logdata.stdout_lines|map('trim')|list }}"
+  when: inventory_hostname in groups['dbservers']
+  # when: inventory_hostname in groups['ora_x1']
+
+

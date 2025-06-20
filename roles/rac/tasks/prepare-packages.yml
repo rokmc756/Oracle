@@ -45,16 +45,19 @@
     name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm
     state: present
     disable_gpg_check: yes
-  when: inventory_hostname in groups['ora_x1']
+  when: inventory_hostname in groups['dbservers']
+
+  # when: inventory_hostname in groups['ora_x1']
   # name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el7.x86_64.rpm
 
 
-- name: Install Oracle Database Preinstall RPM from a Local File
-  yum:
-    name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm
-    state: present
-    disable_gpg_check: yes
-  when: inventory_hostname in groups['ora_x2']
+#- name: Install Oracle Database Preinstall RPM from a Local File
+#  yum:
+#    name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm
+#    state: present
+#    disable_gpg_check: yes
+#  when: inventory_hostname in groups['ora_x2']
+  # when: inventory_hostname in groups['ora_x2']
   # name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el7.x86_64.rpm
 
 
@@ -70,8 +73,10 @@
     group="{{ oracle_install_group }}"
     owner="{{ oracle_user }}"
   register: upack_oracle_db_software
-  when: inventory_hostname in groups['ora_x1']
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora_x1']
 - debug: msg={{ upack_oracle_db_software }}
-  when: inventory_hostname in groups['ora_x1']
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora_x1']
 
 

@@ -12,10 +12,8 @@
     -skipStackCheck -responseFile {{ stage_dir }}/{{ gi_rspfile }} > /u02/stage/giinstalloutput.log
   register: racgisoft_install_result
   failed_when: racgisoft_install_result.rc != 6   #### This condition is based on my own setup
-  # ignore_errors: true
   when: inventory_hostname in groups['primary']
   # no_log: true
-  # no_log: false
   # args:
   #   warn: false # set warn=false to prevent warning
 

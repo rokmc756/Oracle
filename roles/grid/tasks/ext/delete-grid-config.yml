@@ -1,0 +1,36 @@
+---
+#- name: Delete Remaining Oracle Grid Config
+#  file: path={{ item }} state=absent
+#  with_items:
+#    - "/etc/oracle/olr.loc"
+#    - "/etc/oraInst.loc"
+#    - "/etc/oracle.ahf.loc"
+#    - "/etc/oratab"
+#    - "/etc/oracle"
+
+
+- name: Remove leftover CRS files and config
+  file: path={{ item }} state=absent
+  register: remove_leftover_crs_file_config
+  with_items:
+    - "/etc/oracle"
+    - "{{ grid_home }}"
+    - "{{ oracle_base }}"
+    - "/etc/oraInst.loc"
+    - "/etc/oratab"
+    - "/etc/oracle.ahf.loc"
+    - "var/tmp/.oracle"
+    - "/tmp/.oracle"
+- debug: msg={{ remove_leftover_crs_file_config }}
+
+
+- name: Remove leftover CRS Systemd Config File
+  shell: |
+    rm -f /etc/init.d/init.{{ item }}*
+  register: remove_leftover_crs_systemd_config_file
+  with_items:
+    - crs
+    - cssd
+    - ohasd
+- debug: msg={{ remove_leftover_crs_systemd_config_file }}
+

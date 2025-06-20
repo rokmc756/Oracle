@@ -10,5 +10,6 @@
     mode=0775
   with_items:
     - "{{ oracle_base }}"
+    - "/u01/app"             # Added manually to avoid error when running root.sh
   when: inventory_hostname in groups['dbservers']
 

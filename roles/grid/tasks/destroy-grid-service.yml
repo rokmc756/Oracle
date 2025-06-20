@@ -1,0 +1,106 @@
+---
+#- name: Stop CRS on all nodes
+#  shell: |
+#    {{ grid_home}}/bin/crsctl stop crs -f
+#  register: stop_all_crs
+#- debug: msg={{ stop_all_crs }}
+
+
+- name: Generate deinstall rsp file
+  become_user: "{{ grid_user }}"
+  shell: |
+    {{ grid_home }}/deinstall/deinstall -silent -checkonly
+  register: gen_deinstall_rsp_file
+  when: inventory_hostname in groups['primary']
+- debug: msg="{{ gen_deinstall_rsp_file.stdout_lines }}"
+  when: inventory_hostname in groups['primary']
+
+- set_fact:
+    deinstall_rsp_file="{{ ( gen_deinstall_rsp_file.stdout_lines | select('search', 'Location of response file generated') | list | string | split(' '))[-1] | replace('\"]', '') }}"
+  when: inventory_hostname in groups['primary']
+
+- debug: msg={{ deinstall_rsp_file }}
+  when: inventory_hostname in groups['primary']
+
+
+- name: Generate Deinstall Script and File
+  become_user: "{{ grid_user }}"
+  shell: |
+    {{ grid_home }}/deinstall/deinstall -silent --paramfile {{ deinstall_rsp_file }}
+  register: gen_deinstall_script_file
+  when: inventory_hostname in groups['primary']
+- debug: msg="{{ gen_deinstall_script_file.stdout_lines }}"
+  when: inventory_hostname in groups['primary']
+
+
+#- set_fact:
+#    rootcrs_script_file="{{ ( gen_deinstall_script_file.stdout_lines | select('search', 'rootcrs.sh') | list | string | split(' '))[6] }}"
+#  when: inventory_hostname in groups['primary']
+#- debug: msg={{ rootcrs_script_file }}
+#  when: inventory_hostname in groups['primary']
+
+# /deinstall_OraGI21Home1.rsp
+# /u02/app/21.3.0/grid/crs/install/rootcrs.sh -force  -deconfig \
+# -paramfile "/tmp/deinstall2025-06-20_10-43-10PM/response/deinstall_OraGI21Home1.rsp"
+
+
+#- set_fact:
+#    deinstall_script_file="{{ ( gen_deinstall_script_file.stdout_lines | select('search', 'rootdeinstall.sh') | list | string | split(' '))[6] | replace('\"', '')  }}"
+#  when: inventory_hostname in groups['primary']
+#- debug: msg={{ deinstall_script_file }}
+#  when: inventory_hostname in groups['primary']
+
+
+#"####################### DECONFIG CLEAN OPERATION SUMMARY #######################",
+# "As the privileged user, execute  \"/tmp/deinstall2025-06-20_10-35-01PM/rootdeinstall.sh\" on this node
+# to remove the configuration of the Oracle Restart and to completely remove the Oracle software",
+# "Oracle Restart is stopped and de-configured successfully.",
+# "#######################################################################",
+
+
+#- name: Execute rootdeinstall.sh
+#  remote_user: "{{ root_user }}"
+#  shell: |
+#    {{ deinstall_script_file }}
+#  register: execute_root_deinstall
+#  when: inventory_hostname in groups['primary']
+#- debug: msg="{{ execute_root_deinstall.stdout_lines }}"
+#  when: inventory_hostname in groups['primary']
+
+
+
+# The network configuration has been cleaned up successfully.
+#
+# Network Configuration clean config END
+#
+# <----------------------------------------
+# 
+# As the privileged user, Execute  "/u02/app/21.3.0/grid/crs/install/rootcrs.sh -force  -deconfig -paramfile "/tmp/deinstall2025-06-20_10-12-46PM/response/deinstall_OraGI21Home1.rsp"" on every node in this cluster except for this node, and then execute "/tmp/deinstall2025-06-20_10-12-46PM/rootdeinstall.sh" on this node to remove the configuration of the Oracle Clusterware and to completely remove the Oracle software
+#
+# <----------------------------------------
+# 
+######################### DECONFIG CLEAN OPERATION END #########################
+#
+####################### DECONFIG CLEAN OPERATION SUMMARY #######################
+# As the privileged user, Execute  "/u02/app/21.3.0/grid/crs/install/rootcrs.sh -force  -deconfig -paramfile "/tmp/deinstall2025-06-20_10-12-46PM/response/deinstall_OraGI21Home1.rsp"" on every node in this cluster except for this node, and then execute "/tmp/deinstall2025-06-20_10-12-46PM/rootdeinstall.sh" on this node to remove the configuration of the Oracle Clusterware and to completely remove the Oracle software
+# Oracle Clusterware is stopped and de-configured successfully.
+#######################################################################
+#
+############# ORACLE DECONFIG TOOL END #############
+#
+# /u02/app/21.3.0/grid/crs/install/rootcrs.sh -force  -deconfig -paramfile "/tmp/deinstall2025-06-20_10-12-46PM/response/deinstall_OraGI21Home1.rsp
+#
+
+
+####################### DECONFIG CHECK OPERATION SUMMARY #######################
+#Oracle Grid Infrastructure Home is: /u02/app/21.3.0/grid
+#The following nodes are part of this cluster: rk8-oracle01
+#The cluster node(s) on which the Oracle home deinstallation will be performed are:rk8-oracle01
+#Oracle Home selected for deinstall is: /u02/app/21.3.0/grid
+#Inventory Location where the Oracle home registered is: /u02/app/oraInventory
+#ASM was not detected in the Oracle Home
+#Location of response file generated: '/tmp/deinstall2025-06-20_09-45-13PM/response/deinstall_OraGI21Home1.rsp'
+#A log of this session will be written to: '/tmp/deinstall2025-06-20_09-45-13PM/logs/deinstall_deconfig2025-06-20_09-45-19-PM.out'
+#Any error messages from this session will be written to: '/tmp/deinstall2025-06-20_09-45-13PM/logs/deinstall_deconfig2025-06-20_09-45-19-PM.err'
+
+

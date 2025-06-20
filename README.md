@@ -188,5 +188,6 @@ $ make single r=stop s=db
 - [ ] ADD Upgrade
 - [ ] Consider playbook to add RAC referring to this link - https://github.com/oravirt/ansible-oracle, http://www.koreaoug.org/install/9222
 - [ ] Install Oracle Grid Software
+- [ ] Deinstall RAC - https://oracledbwr.com/step-by-step-deleting-node-in-oracle-rac-12c-release-1-environment/
 
 

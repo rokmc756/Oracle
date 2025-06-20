@@ -68,6 +68,4 @@
   failed_when:        false
   no_log:             true
   when: inventory_hostname in groups['primary']
-- debug: msg={{ cluvfy_stage_pre_crsinst }}
-  when: inventory_hostname in groups['primary']
 

@@ -13,6 +13,7 @@
     - "{{ ora_inventory }}"
     - "{{ grid_base }}"
     - "{{ grid_home }}"
-    - "{{ software_dir }}"      ## Added Manually
+    - "{{ software_dir }}"              # Added Manually
+    - "/u01/app"                        # To avoid errors appeared when running root.sh
   when: inventory_hostname in groups['dbservers']
 

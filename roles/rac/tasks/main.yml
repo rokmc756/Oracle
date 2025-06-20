@@ -45,20 +45,28 @@
   when: ( software is defined and software ==  true ) or ( rac_all is defined and rac_all == true )
 
 
-- name: Execute n1 Root.sh
-  # become:           yes
-  # become_user:      root
-  import_tasks: execute-rootn1.yml
-  tags: execute
-  when: ( rootn1 is defined and rootn1 ==  true ) or ( rac_all is defined and rac_all == true )
+#- name: Execute n1 Root.sh
+#  # become:           yes
+#  # become_user:      root
+#  import_tasks: execute-rootn1.yml
+#  tags: execute
+#  when: ( rootn1 is defined and rootn1 ==  true ) or ( rac_all is defined and rac_all == true )
+#
+#
+#- name: Execute n2 Root.sh
+#  # become:           yes
+#  # become_user:      root
+#  import_tasks: execute-rootn2.yml
+#  tags: execute
+#  when: ( rootn2 is defined and rootn2 ==  true ) or ( rac_all is defined and rac_all == true )
 
 
-- name: Execute n2 Root.sh
+- name: Execute Root.sh
   # become:           yes
   # become_user:      root
-  import_tasks: execute-rootn2.yml
+  import_tasks: execute-root.yml
   tags: execute
-  when: ( rootn2 is defined and rootn2 ==  true ) or ( rac_all is defined and rac_all == true )
+  when: ( root is defined and root ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Verify Oracle RAC Database Software Installed
@@ -66,7 +74,7 @@
   # become_user:      root
   tags: verify
   import_tasks: verify-database.yml
-  when: (( db is defined and db ==  true ) or ( rac_all is defined and rac_all == true )) and inventory_hostname in groups['dbservers']
+  when: ( db is defined and db ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Remove Stage Directory

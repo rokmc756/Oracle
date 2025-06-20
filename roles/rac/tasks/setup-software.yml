@@ -29,7 +29,8 @@
     {{ oracle_home }}/runInstaller -ignorePrereq -waitforcompletion -silent -responseFile {{ stage_dir }}/{{ dbsoft21c_rsp }} > /u02/stage/dbinstalloutput.log
   failed_when: racdbsoft_install_result.rc != 6   #### This condition is based on my own setup
   register: racdbsoft_install_result
-  when: inventory_hostname in groups['ora_x1']
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora_x1']
   # when: inventory_hostname in groups['ora_x1'] and oracle_home not in dbsoft_install_check.stdout_lines
   # args:
   #    warn: false # set warn=false to prevent warning
@@ -44,14 +45,16 @@
   become_user: oracle
   shell: grep -r "Successfully Setup Software with *" /u02/stage/dbinstalloutput.log
   register: racdbsoftinstall_log
-  when: inventory_hostname in groups['ora_x1']
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora_x1']
 
 
 - name: Output from Post Database Software Installation Check
   debug:
     var: racdbsoftinstall_log.stdout
     verbosity: 0
-  when: inventory_hostname in groups['ora_x1'] and "'Successfully Setup Software.' or 'Successfully Setup Software with warning(s).' in racdbsoftinstall_log.stdout"
+  when: inventory_hostname in groups['primary'] and "'Successfully Setup Software.' or 'Successfully Setup Software with warning(s).' in racdbsoftinstall_log.stdout"
+  # when: inventory_hostname in groups['ora_x1'] and "'Successfully Setup Software.' or 'Successfully Setup Software with warning(s).' in racdbsoftinstall_log.stdout"
 
 
 # [oracle@rk8-oracle02 oracle]$ sh install-rac.sh
