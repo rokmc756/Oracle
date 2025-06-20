@@ -20,8 +20,10 @@ Installedition:                  EE
 DBA_GROUP:                       dba
 OPER_GROUP:                      oper
 OSOTHERS_GROUP:                  oinstall
-# NODES:                           ora-x1,ora-x2
-NODES:                           rk8-oracle02,rk8-oracle03
+# NODES:                         ora-x1,ora-x2
+syspass:                        "changeme"
+systempass:                     "changeme"
+NODES:                           rk8-oracle01,rk8-oracle02,rk8-oracle03
 opatchenv:
   ORACLE_HOME: "{{ oracle_home }}"
   PATH: "{{ oracle_home}}/OPatch:$PATH:/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin"

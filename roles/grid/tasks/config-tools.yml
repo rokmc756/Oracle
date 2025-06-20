@@ -10,13 +10,13 @@
   shell: |
     {{ grid_home }}/gridSetup.sh -silent -executeConfigTools -responseFile {{ stage_dir }}/{{ gi_rspfile }}
   register: racgi_configtools_result
-  failed_when: racgi_configtools_result.rc != 0   #### This condition is based on my own setup
+  failed_when: racgi_configtools_result.rc != 255   #### This condition is based on my own setup
   when: inventory_hostname in groups['primary']
 - debug: msg={{ racgi_configtools_result }}
   when: inventory_hostname in groups['primary']
   # args:
   #   warn: false # set warn=false to prevent warning
-  # failed_when: racgi_configtools_result.rc != 255   #### This condition is based on my own setup
+  # failed_when: racgi_configtools_result.rc != 0   #### This condition is based on my own setup
 
 
 - name: Get the Log Information

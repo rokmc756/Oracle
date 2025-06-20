@@ -28,16 +28,14 @@
     - "{{ stage_dir }}"
     - "{{ softstage_dir }}"
     - "{{ oracle_home }}"
-  # when: inventory_hostname in groups['dbservers']
 
 
 - name: Copy Database Pre Install 21c RPM Pfile to the Target Database Server
   remote_user: "{{ root_user }}"
   copy: src={{ item.fn }} dest={{ item.dest }} owner=grid group=oinstall mode=0775
   with_items:
-    - { dest: "{{ stage_dir }}" , fn: "oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm" }
+    - { dest: "{{ stage_dir }}" ,    fn: "oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm" }
     - { dest: "{{ softstage_dir }}", fn: "LINUX.X64_213000_db_home.zip" }
-  # copy: src=/etc/ansible/roles/racdbsoft21c_install/templates/{{ item }} dest={{ stage_dir }} owner=grid group=oinstall mode=0775
 
 
 - name: Install Oracle Database Preinstall RPM from a Local File
@@ -45,25 +43,10 @@
     name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm
     state: present
     disable_gpg_check: yes
-  when: inventory_hostname in groups['dbservers']
-
-  # when: inventory_hostname in groups['ora_x1']
-  # name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el7.x86_64.rpm
-
-
-#- name: Install Oracle Database Preinstall RPM from a Local File
-#  yum:
-#    name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm
-#    state: present
-#    disable_gpg_check: yes
-#  when: inventory_hostname in groups['ora_x2']
-  # when: inventory_hostname in groups['ora_x2']
-  # name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el7.x86_64.rpm
 
 
 - name: Unpack Oracle 21c Database Software
   remote_user: "{{ root_user }}"
-  become: yes
   become_user: "{{ oracle_user }}"
   unarchive:
     src={{ softstage_dir }}/LINUX.X64_213000_db_home.zip
@@ -74,9 +57,6 @@
     owner="{{ oracle_user }}"
   register: upack_oracle_db_software
   when: inventory_hostname in groups['primary']
-  # when: inventory_hostname in groups['ora_x1']
 - debug: msg={{ upack_oracle_db_software }}
   when: inventory_hostname in groups['primary']
-  # when: inventory_hostname in groups['ora_x1']
-
 

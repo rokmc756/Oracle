@@ -1,16 +1,14 @@
 ---
-# =============================================================================
+#=============================================================================
 # (1) Get Database and Patch Versions 
-# =============================================================================
+#=============================================================================
 
 - name: Get Database and Patch Versions
   remote_user: "{{ root_user }}"
-  become: yes
   become_user: oracle
   shell: |
     opatch lsinventory|grep "Oracle Database" > {{stage_dir}}/output.log
   environment: "{{ opatchenv }}"
-  when: inventory_hostname in groups['dbservers']
 
 
 - name: Output for Database Software and Patch Information
@@ -20,11 +18,9 @@
   shell: |
     cat {{ stage_dir }}/output.log
   register: dbsoftinfo
-  when: inventory_hostname in groups['dbservers']
 
 
 - name: "Output from Post Database Software Installation Check"
   debug:
     var: dbsoftinfo.stdout_lines|map('trim')|list
-  when: inventory_hostname in groups['dbservers']
 

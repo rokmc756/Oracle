@@ -16,6 +16,12 @@
     oracle_version: "{{ _oracle.major_version }}{{ _oracle.patch_version }}"
 
 
+- name: Define Facts for All Worker's Hostname
+  set_fact:
+    all_db_hosts: "{{ groups['all'] | map('extract', hostvars, ['ansible_hostname']) | join(',') }}"
+- debug: msg={{ all_db_hosts }}
+
+
 - name: Set fact for Oracle Group List Except Oinstall Group
   set_fact:
     oracle_group_list: "{{ _rac.install_group | selectattr('group', 'defined') | map(attribute='group') | reject('search','oinstall') | join(',') }}"

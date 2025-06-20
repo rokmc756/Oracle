@@ -14,7 +14,7 @@
 #==============================================================================================================================
 
 
-- name: Check OS ( Oracle )
+- name: Check OS ( Oracle Grid Infrastructure )
   fail: msg="Not a Red Hat based system!"
   when: ansible_os_family != 'RedHat' or ansible_os_family != 'CentOS' or ansible_os_family != 'Rocky'
 
