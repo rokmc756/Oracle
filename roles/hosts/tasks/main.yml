@@ -54,6 +54,18 @@
   when: inventory_hostname in groups['servers']
 
 
+- name: Setup DNS Zone and Record
+  import_tasks: dns/config-dns.yml
+  tags: config, install
+  when: (( zone is defined and zone == true ) or ( record is defined and record == true )) and inventory_hostname in groups['dns']
+
+
+- name: Remove DNS Zone and Record
+  import_tasks: dns/deconfig-dns.yml
+  tags: deconfig, uninstall
+  when: (( zone is defined and zone == true ) or ( record is defined and record == true )) and inventory_hostname in groups['dns']
+
+
 - name: Uninstall SSH Keys and Sudo Users as well as Prerequiestes Software Packages
   import_tasks: uninstall.yml
   tags: uninit, uninstall

@@ -1,26 +1,6 @@
-# ansible_ssh_pass: "changeme"
-# ansible_become_pass: "changeme"
-
-sudo_user: "oraadm"
-sudo_group: "oraadm"
-
-oracle_user: "oracle"
-oracle_user_pass: "changeme"
-
-grid_user: "grid"
-grid_user_pass: "changeme"
-
-local_sudo_user: "jomoon"
-wheel_group: "wheel"            # RHEL / CentOS / Rocky / SUSE / OpenSUSE
-# wheel_group: "sudo"           # Debian / Ubuntu
-
-root_user_pass: "changeme"
-sudo_user_pass: "changeme"
-sudo_user_home_dir: "/home/{{ sudo_user }}"
-domain_name: "jtest.pivotal.io"
-uninstall_deps_pkgs: false
-
-
+### Setup DNS with FreeIPA
+#### 1) Configure Varialbes for DNS Zone and Records
+```
 _dns:
   freeipa:
     ipaddr: 192.168.2.199
@@ -50,4 +30,21 @@ _dns:
       - { name: "244",  zone: 2.168.192.in-addr.arpa,  type: "--ptr-rec", value: "rk8-oracle01-vip.jtest.pivotal.io."  }
       - { name: "245",  zone: 2.168.192.in-addr.arpa,  type: "--ptr-rec", value: "rk8-oracle02-vip.jtest.pivotal.io."  }
       - { name: "246",  zone: 2.168.192.in-addr.arpa,  type: "--ptr-rec", value: "rk8-oracle03-vip.jtest.pivotal.io."  }
+```
+
+#### 2) Add DNS Zones and Records
+```
+$ make dns r=config s=zone
+$ make dns r=config s=record
+or
+$ make dns r=config s=all
+```
+
+#### 3) Remove DNS Zones and Records
+```yaml
+$ make dns r=deconfig c=record
+$ make dns r=deconfig c=zone
+or
+$ make dns r=deconfig c=all
+```
 
