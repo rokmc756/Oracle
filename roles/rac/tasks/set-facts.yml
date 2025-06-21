@@ -14,7 +14,7 @@
 - name: Define Fact Oracle Version
   set_fact:
     oracle_version: "{{ _oracle.major_version }}{{ _oracle.patch_version }}"
-
+    oracle_preinstall_pkg: "oracle-database-preinstall-{{ ora_ver }}-{{ _oracle.preinstall.major_version }}.{{ _oracle.preinstall.minor_version }}-{{ _oracle.preinstall.patch_version }}.{{ _oracle.os_version }}.{{ _oracle.arch_type }}.{{ _oracle.bin_type }}"
 
 - name: Define Facts for All Worker's Hostname
   set_fact:

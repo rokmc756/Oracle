@@ -21,7 +21,7 @@
 
 - name: Set Facts for Network and Packages Informations
   import_tasks: set-facts.yml
-  tags: deploy, destroy, prepare, install, uninstall, add, setup, execute, remove, validate, finalize, create, delete, config, modify, pre, post
+  tags: testfact, deploy, destroy, prepare, install, uninstall, add, setup, execute, remove, validate, finalize, create, delete, config, modify, pre, post
 
 
 - name: Display Pre Installation of Oracle Grid Infrastructure Software Message

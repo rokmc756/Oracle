@@ -31,24 +31,24 @@
 
 - name: Pre Install Oracle RAC Database Software
   import_tasks: prepare-packages.yml
-  tags: prepare
+  tags: prepare, install
   when: ( pkgs is defined and pkgs ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Setup Oracle RAC Database Software
   import_tasks: setup-packages.yml
-  tags: setup
+  tags: setup, install
   when: ( pkgs is defined and pkgs ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Execute Root.sh
   import_tasks: execute-root.yml
-  tags: execute
+  tags: execute, install
   when: ( root is defined and root ==  true ) or ( rac_all is defined and rac_all == true )
 
 
 - name: Verify Oracle RAC Database Software Installed
-  tags: verify
+  tags: verify, install
   import_tasks: verify-database.yml
   when: ( db is defined and db ==  true ) or ( rac_all is defined and rac_all == true )
 
@@ -60,7 +60,7 @@
     state: absent
   with_items:
     - "{{ stage_dir }}"
-  tags: remove, install
+  tags: remove
   when: ( stage is defined and stage ==  true ) or ( rac_all is defined and rac_all == true )
 
 
@@ -69,6 +69,13 @@
     msg:
       - 'This Steps completed below task for RAC database at {{ansible_date_time.iso8601}}:'
       - 'Install of Oracle 21c Oracle RAC Database Software task is completed successfully in Silent Mode'
-  tags: post
+  tags: post, install
   when: ( msg is defined and msg ==  true ) or ( rac_all is defined and rac_all == true )
+
+
+- name: Destroy Oracle RAC Service
+  import_tasks: destroy-rac-service.yml
+  tags: destroy, uninstall
+  when: ( service is defined and service == true ) or ( rac_all is defined and rac_all == true )
+
 

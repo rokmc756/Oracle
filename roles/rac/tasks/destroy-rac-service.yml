@@ -1,0 +1,27 @@
+---
+- name: Generate DeInstall RSP File
+  become_user: "{{ oracle_user }}"
+  shell: |
+    {{ oracle_home }}/deinstall/deinstall -silent -checkonly
+  register: gen_deinstall_rsp_file
+  when: inventory_hostname in groups['primary']
+- debug: msg="{{ gen_deinstall_rsp_file.stdout_lines }}"
+  when: inventory_hostname in groups['primary']
+
+- set_fact:
+    deinstall_rsp_file="{{ ( gen_deinstall_rsp_file.stdout_lines | select('search', 'Location of response file generated') | list | string | split(' '))[-1] | replace('\"]', '') }}"
+  when: inventory_hostname in groups['primary']
+
+- debug: msg={{ deinstall_rsp_file }}
+  when: inventory_hostname in groups['primary']
+
+
+- name: Generate Deinstall Script and File
+  become_user: "{{ oracle_user }}"
+  shell: |
+    {{ oracle_home }}/deinstall/deinstall -silent --paramfile {{ deinstall_rsp_file }}
+  register: gen_deinstall_script_file
+  when: inventory_hostname in groups['primary']
+- debug: msg="{{ gen_deinstall_script_file.stdout_lines }}"
+  when: inventory_hostname in groups['primary']
+

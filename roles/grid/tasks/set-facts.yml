@@ -14,12 +14,15 @@
 - name: Define Fact Oracle Version
   set_fact:
     oracle_version: "{{ _oracle.major_version }}{{ _oracle.patch_version }}"
+    oracle_preinstall_pkg: "oracle-database-preinstall-{{ ora_ver }}-{{ _oracle.preinstall.major_version }}.{{ _oracle.preinstall.minor_version }}-{{ _oracle.preinstall.patch_version }}.{{ _oracle.os_version }}.{{ _oracle.arch_type }}.{{ _oracle.bin_type }}"
 
 
 - name: Define Facts for All Worker's Hostname
   set_fact:
     all_db_hosts: "{{ groups['all'] | map('extract', hostvars, ['ansible_hostname']) | join(',') }}"
+    all_cluster_nodes:  "{{ groups['all'] | map('extract', hostvars, ['ansible_hostname']) | map('regex_replace', '$', '.jtest.pvital.io' ) | map('regex_replace', '$',  ':' ~ ansible_hostname ~ '-vip.jtest.pvital.io' ) | list | join(',') }}"
 - debug: msg={{ all_db_hosts }}
+- debug: msg={{ all_domain_list }}
 
 
 #- name: Set fact for Oracle Group List Except Oinstall Group
@@ -32,5 +35,17 @@
     netdev: "{{ netdev2 }}"
     _netdev: "ansible_{{ netdev2 }}"
     _ipaddr: "{{ ipaddr2 }}"
+    network0: "{{ hostvars[inventory_hostname]['ansible_'~netdev0]['ipv4']['network'] }}"
+    network2: "{{ hostvars[inventory_hostname]['ansible_'~netdev2]['ipv4']['network'] }}"
+- debug: msg={{ network0 }}
+- debug: msg={{ network2 }}
+
+
+- name: Set fact for ASM Disk Groups
+  set_fact:
+    asmdisk_list: "{{ _grid.asmdisks | map(attribute='name') | join(',') }}"
+    asmdisk_fg_list: "{{ _grid.asmdisks | map(attribute='name') | join(',,') }}"
+- debug: msg={{ asmdisk_list }}
+- debug: msg={{ asmdisk_fg_list }}
 
 

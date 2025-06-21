@@ -32,7 +32,6 @@
   when: inventory_hostname in groups['primary']
   # args:
   #    warn: false # set warn=false to prevent warning
-  # no_log: false
   # no_log: true
 - debug: msg={{ racdbsoft_install_result }}
 

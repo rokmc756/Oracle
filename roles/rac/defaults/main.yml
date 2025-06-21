@@ -1,0 +1,21 @@
+---
+# defaults file for oracle19c_install
+oracle_dep_rpms: "bc,binutils,compat-openssl10,elfutils-libelf,glibc,glibc-devel,
+ksh,libaio,libXrender,libX11,libXau,libXi,libXtst,libgcc,libnsl,libstdc++,libxcb,
+libibverbs,make,policycoreutils,policycoreutils-python-utils,smartmontools,sysstat,
+libnsl2,libnsl2-devel,net-tools,nfs-utils,unzip,java-1.8.0-openjdk"
+
+
+rh7_dep_pkgs: "tk"
+rh8_dep_pkgs: "tk"
+rh9_dep_pkgs: "tk"
+rh10_dep_pkgs: "tk"
+
+rh7_python_pkgs: "python-psycopg2"
+rh8_python_pkgs: "python39,python39-pip,python39-libs,python39-devel"
+rh9_python_pkgs: "python3.11,python3.11-pip,python3.11-libs,python3.11-devel"
+rh10_python_pkgs: "python3.12-pip,python3.12-devel"
+
+rh7_21c_oracle_preinstall_rpm: "oracle-database-preinstall-21c-1.0-1.el7.x86_64.rpm"
+rh8_21c_oracle_preinstall_rpm: "oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm"
+

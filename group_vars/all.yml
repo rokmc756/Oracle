@@ -38,6 +38,10 @@ _oracle:
   home_dir:           "/u01/app/oracle/product/{{ ora_ver }}/dbhome_1"
   rsp:                "Oracle_EE_SoftOnly"
   binary:             "LINUX.X64_193000_db_home.zip"  #  "LINUX.X64_213000_db_home.zip"
+  preinstall:
+    major_version: 1
+    minor_version: 0
+    patch_version: 1
   data:
     disk: vdb
     parts:

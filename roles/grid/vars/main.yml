@@ -1,6 +1,6 @@
 ---
 oracle_user: "oracle"
-software_dir: "/u01/stage" 
+software_dir: "/u01/stage"
 oracle_install_group: "oinstall"
 root_dir: "/u02"
 stage_dir: "/u02/stage"
@@ -34,13 +34,17 @@ ClusterConfigu_Type: STANDALONE
 clusterName: racdb01
 vscanName: "{{ vclusterName }}-scan"
 vscanPort: 1521
-node1_fq_hostname: ora-x1.localdomain
-node1_fq_vipname: ora-x1-vip.localdomain
-node2_fq_hostname: ora-x2.localdomain
-node2_fq_vipname: ora-x2-vip.localdomain
-networkInterfaceList: "enp0s8:212.168.56.0:1,enp0s9:212.168.1.0:5"
-SYS_PASSWORD: Oracle123
-SYSASMPassword: Oracle123
+node1_fq_hostname: rk8-oracle01.jtest.pivotal.io
+node1_fq_vipname:  rk8-oracle01-vip.jtest.pivotal.io
+node2_fq_hostname: rk8-oracle02.jtest.pivotal.io
+node2_fq_vipname:  rk8-oracle02-vip.jtest.pivotal.io
+node3_fq_hostname: rk8-oracle03.jtest.pivotal.io
+node3_fq_vipname:  rk8-oracle03-vip.jtest.pivotal.io
+networkInterfaceList: "{{ netdev2 }}:{{ network2 }}:1,{{ netdev0 }}:{{ network0 }}:5"
+SYS_PASSWORD: changeme
+# SYS_PASSWORD: Oracle123
+SYSASMPassword: changeme
+# SYSASMPassword: Oracle123
 storage_Option: FLEX_ASM_STORAGE
 dg_name: DATA
 dg_redundancy: EXTERNAL
@@ -55,4 +59,40 @@ asmdiskGroupdisks: '{{ asmdiskpre }}1,{{ asmdiskpre }}2,{{ asmdiskpre }}3,{{ asm
 dg_au: 1
 asmdiskDiscoveryString: "/dev/oracleasm/disks"
 disk_discstr: "/dev/oracleasm/disks/*"
+
+
+_grid:
+  ClusterConfigu_Type: STANDALONE
+  clusterName: racdb01
+  vscanName: "{{ clusterName }}-scan"
+  vscanPort: 1521
+  # node1_fq_hostname: rk8-oracle01.jtest.pivotal.io
+  # node1_fq_vipname:  rk8-oracle01-vip.jtest.pivotal.io
+  # node2_fq_hostname: rk8-oracle02.jtest.pivotal.io
+  # node2_fq_vipname:  rk8-oracle02-vip.jtest.pivotal.io
+  # node3_fq_hostname: rk8-oracle03.jtest.pivotal.io
+  # node3_fq_vipname:  rk8-oracle03-vip.jtest.pivotal.io
+  networkInterfaceList: "{{ netdev2 }}:{{ network2 }}:1,{{ netdev0 }}:{{ network0 }}:5"
+  SYS_PASSWORD: "changeme"
+  SYSASMPassword: "changeme"
+  storage_Option: FLEX_ASM_STORAGE
+  dg_name: DATA
+  dg_redundancy: EXTERNAL
+  monitor_Password: "changeme"
+  ignore_DownNodes: false
+  mgt_Option: NONE
+  oms_Port: 0
+  execute_RootScript: false
+  domain: "jtest.pivotal.io"
+  dev_group: /dev/rac
+  asmdisks:
+    - { name: "/dev/rac/crs1" }
+    - { name: "/dev/rac/crs2" }
+    - { name: "/dev/rac/crs3" }
+    - { name: "/dev/rac/data" }
+    - { name: "/dev/rac/fra" }
+  asmdiskpre: /dev/oracleasm/disks/ASM_DISK0
+  dg_au: 1
+  asmdiskDiscoveryString: "/dev/oracleasm/disks"
+  disk_discstr: "/dev/oracleasm/disks/*"
 

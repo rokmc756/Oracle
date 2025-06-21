@@ -57,6 +57,4 @@
     owner="{{ oracle_user }}"
   register: upack_oracle_db_software
   when: inventory_hostname in groups['primary']
-- debug: msg={{ upack_oracle_db_software }}
-  when: inventory_hostname in groups['primary']
 

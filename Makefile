@@ -43,7 +43,7 @@ download:
 	elif [ "${*}" = "dns" ]; then\
 		ln -sf ansible-hosts-rk9-dns ansible-hosts;\
 		cat setup-temp.yml.tmp | sed -e 's/temp/hosts/g' > setup-${*}.yml;\
-	elif [ "${*}" = "oracle" ]; then\
+	elif [ "${*}" = "single" ]; then\
 		ln -sf ansible-hosts-rk8-single ansible-hosts;\
 	elif [ "${*}" = "rac" ] || [ "${*}" = "grid" ]; then\
 		ln -sf ansible-hosts-rk8-rac ansible-hosts;\

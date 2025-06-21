@@ -26,9 +26,9 @@ oracle.install.asm.diskGroup.AUSize=1
 # oracle.install.asm.diskGroup.disks=/dev/oracleasm/disks/ASM_DISK01,/dev/oracleasm/disks/ASM_DISK02,/dev/oracleasm/disks/ASM_DISK03,/dev/oracleasm/disks/ASM_DISK04,/dev/oracleasm/disks/ASM_DISK05,/dev/oracleasm/disks/ASM_DISK06
 # oracle.install.asm.diskGroup.diskDiscoveryString=/dev/oracleasm/disks/*
 
-# oracle.install.asm.diskGroup.disksWithFailureGroupNames=/dev/rac/crs1,,/dev/rac/crs2,,/dev/rac/crs3,,/dev/rac/data,,/dev/rac/fra
-oracle.install.asm.diskGroup.disks=/dev/rac/crs1,/dev/rac/crs2,/dev/rac/crs3,/dev/rac/data,/dev/rac/fra
-oracle.install.asm.diskGroup.diskDiscoveryString=/dev/rac/*
+# oracle.install.asm.diskGroup.disksWithFailureGroupNames={{ asmdisk_fg_list }}
+oracle.install.asm.diskGroup.disks={{ asmdisk_list }}
+oracle.install.asm.diskGroup.diskDiscoveryString={{ _grid.dev_group }}/*
 oracle.install.asm.monitorPassword=changeme   # Oracle123
 oracle.install.asm.gimrDG.AUSize=1
 oracle.install.asm.configureAFD=false
@@ -36,4 +36,5 @@ oracle.install.crs.configureRHPS=false
 oracle.install.crs.config.ignoreDownNodes=false
 oracle.install.config.managementOption=NONE
 oracle.install.crs.rootconfig.executeRootScript=false
+
 
