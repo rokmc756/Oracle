@@ -1,0 +1,39 @@
+---
+#=============================================================================
+# (1) Execute root.sh scripts
+#=============================================================================
+
+- name: Execute root.sh on the Primary Node
+  remote_user: "{{ root_user }}"
+  become: yes
+  shell: "{{ grid_home }}/root.sh"
+  register: rootnode1
+  #tags:
+  #  - gisoftinstall_exeroot
+  when: inventory_hostname in groups['primary']
+
+
+- name: Get the logfile Name on the Primary Node
+  remote_user: "{{ root_user }}"
+  become: yes
+  shell: "echo {{ rootnode1.stdout }} | grep -oP '(?<=Check).*?(?=for)' "
+  register: logfile
+  when: inventory_hostname in groups['primary']
+
+
+- name: Get the logfile Information on the Primary Node
+  remote_user: "{{ root_user }}"
+  become: yes
+  shell: "cat {{ logfile.stdout }} "
+  with_items:
+    - logino.log
+  args:
+    chdir: /u01/app
+  register: rootloginfon1
+  when: inventory_hostname in groups['primary']
+
+
+- debug:
+    var: rootloginfon1.results[0].stdout_lines
+  when: inventory_hostname in groups['primary']
+

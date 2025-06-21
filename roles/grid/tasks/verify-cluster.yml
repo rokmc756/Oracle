@@ -6,13 +6,13 @@
 
 - name: Add Oratab Entry to First Node
   remote_user: "{{ root_user }}"
-  lineinfile: dest=/etc/oratab line="{{ ASMI }}1:{{ grid_home }}:Y" state=present
+  lineinfile: dest=/etc/oratab line="{{ asmi }}1:{{ grid_home }}:Y" state=present
   when: inventory_hostname in groups['primary']
 
 
 - name: Add Oratab Entry to Second Node
   remote_user: "{{ root_user }}"
-  lineinfile: dest=/etc/oratab line="{{ ASMI }}2:{{ grid_home }}:Y" state=present
+  lineinfile: dest=/etc/oratab line="{{ asmi }}2:{{ grid_home }}:Y" state=present
   when: inventory_hostname in groups['secondary']
 
 

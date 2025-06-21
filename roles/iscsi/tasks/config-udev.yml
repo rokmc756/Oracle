@@ -11,7 +11,7 @@
     cmd: |
       ISCSI_ID=$(/lib/udev/scsi_id -g -u -d /dev/{{ item.iscsi_dev }})
       cat << EOF >> /lib/udev/rules.d/99-iscsidevices.rules
-      KERNEL=="sd?1", SUBSYSTEM=="block", PROGRAM=="/lib/udev/scsi_id -g -u -d /dev/\$parent", RESULT=="$ISCSI_ID", SYMLINK+="rac/{{ item.rac_dev }}", OWNER="grid", GROUP="asmadmin", MODE="0660"
+      KERNEL=="sd?1", SUBSYSTEM=="block", PROGRAM=="/lib/udev/scsi_id -g -u -d /dev/\$parent", RESULT=="$ISCSI_ID", SYMLINK+="{{ item.dev_grp }}/{{ item.rac_dev }}", OWNER="grid", GROUP="asmadmin", MODE="0660"
       EOF
   register: config_udev
   with_items: "{{ _iscsi.target.disks }}"

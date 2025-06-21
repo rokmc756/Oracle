@@ -1,0 +1,19 @@
+---
+#------------------------------------------------------------------------------
+# Install NTP for Cluster
+#------------------------------------------------------------------------------
+
+- name: Install NTP for Cluster
+  yum:
+    name:             ntp
+    state:            installed
+  when: inventory_hostname in groups['dbservers']
+
+
+- name: Ensure NTPd is Running and Enabled
+  service:
+    name:             ntpd
+    state:            started
+    enabled:          yes
+  when: inventory_hostname in groups['dbservers']
+

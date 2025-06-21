@@ -7,92 +7,141 @@ stage_dir: "/u02/stage"
 grid_home: /u02/app/21.3.0/grid
 grid_base: /u02/app/grid
 asmi_name: "+ASM"
-ASMI: "+ASM"
+asmi: "+ASM"
 gridsetup_installer: "{{ grid_home }}/gridSetup.sh"
 gi_rspfile:  gridsetup21c.rsp
 grid_user: grid
 root_user: root
 
-#### SECTION A - BASIC ###########
+##### SECTION A - BASIC ###########
 ora_inventory: /u02/app/oraInventory
 ora_language: en
 install_option: CRS_SWONLY
 oracle_base: /u02/app/oracle
 oracle_home: /u02/app/21.3.0/grid
 
-#### SECTION B - GROUPS ############
+##### SECTION B - GROUPS ############
 dba_grp: dba
 oper_grp: dba
 osasm_grp: dba
 
-##### SECTION C - SCAN   ###########
+###### SECTION C - SCAN   ###########
 scan_name: racdb01-scan
 scan_port: 1521
 
 #### SECTION D - CLUSTER & GNS  ########
-ClusterConfigu_Type: STANDALONE
-clusterName: racdb01
-vscanName: "{{ vclusterName }}-scan"
-vscanPort: 1521
-node1_fq_hostname: rk8-oracle01.jtest.pivotal.io
-node1_fq_vipname:  rk8-oracle01-vip.jtest.pivotal.io
-node2_fq_hostname: rk8-oracle02.jtest.pivotal.io
-node2_fq_vipname:  rk8-oracle02-vip.jtest.pivotal.io
-node3_fq_hostname: rk8-oracle03.jtest.pivotal.io
-node3_fq_vipname:  rk8-oracle03-vip.jtest.pivotal.io
-networkInterfaceList: "{{ netdev2 }}:{{ network2 }}:1,{{ netdev0 }}:{{ network0 }}:5"
-SYS_PASSWORD: changeme
-# SYS_PASSWORD: Oracle123
-SYSASMPassword: changeme
-# SYSASMPassword: Oracle123
-storage_Option: FLEX_ASM_STORAGE
+cluster_config_type: STANDALONE
+cluster_name: racdb01
+vscan_name: "{{ vclusterName }}-scan"
+vscan_port: 1521
+# node1_fq_hostname: rk8-oracle01.jtest.pivotal.io
+# node1_fq_vipname:  rk8-oracle01-vip.jtest.pivotal.io
+# node2_fq_hostname: rk8-oracle02.jtest.pivotal.io
+# node2_fq_vipname:  rk8-oracle02-vip.jtest.pivotal.io
+# node3_fq_hostname: rk8-oracle03.jtest.pivotal.io
+# node3_fq_vipname:  rk8-oracle03-vip.jtest.pivotal.io
+vip_prefix: "vip"
+network_interface_list: "{{ netdev2 }}:{{ network2 }}:1,{{ netdev0 }}:{{ network0 }}:5"
+sys_password: "Changeme12!@"
+sys_asm_password: "Changeme12!@"
+storage_option: FLEX_ASM_STORAGE
 dg_name: DATA
 dg_redundancy: EXTERNAL
-monitor_Password: Oracle123
-ignore_DownNodes: false
-mgt_Option: NONE
-oms_Port: 0
-execute_RootScript: false
-asmdiskpre: /dev/oracleasm/disks/ASM_DISK0
-disksWthFailGrp: '{{ asmdiskpre }}1,,{{ asmdiskpre }}2,,{{ asmdiskpre }}3,,{{ asmdiskpre }}4,,{{ asmdiskpre }}5,,{{ asmdiskpre }}6,'
-asmdiskGroupdisks: '{{ asmdiskpre }}1,{{ asmdiskpre }}2,{{ asmdiskpre }}3,{{ asmdiskpre }}4,{{ asmdiskpre }}5,{{ asmdiskpre }}6'
+monitor_password: "Changeme12!@"
+ignore_downNodes: false
+mgt_option: NONE
+oms_port: 0
+execute_root_script: false
+asm_disk_prefix: /dev/oracleasm/disks/ASM_DISK0
+# disksWthFailGrp: '{{ asmdiskpre }}1,,{{ asmdiskpre }}2,,{{ asmdiskpre }}3,,{{ asmdiskpre }}4,,{{ asmdiskpre }}5,,{{ asmdiskpre }}6,'
+# asmdiskGroupdisks: '{{ asmdiskpre }}1,{{ asmdiskpre }}2,{{ asmdiskpre }}3,{{ asmdiskpre }}4,{{ asmdiskpre }}5,{{ asmdiskpre }}6'
 dg_au: 1
-asmdiskDiscoveryString: "/dev/oracleasm/disks"
-disk_discstr: "/dev/oracleasm/disks/*"
+# asm_disk_discovery_string: "/dev/oracleasm/disks"
+asm_disk_discovery_string: "/dev/oracleasm"
+# disk_discstr: "/dev/oracleasm/disks/*"
+disk_discstr: "/dev/oracleasm/*"
+grid_domain: "jtest.pivotal.io"
+dev_group: /dev/rac
+asmdisks:
+  - { name: "/dev/rac/crs1" }
+  - { name: "/dev/rac/crs2" }
+  - { name: "/dev/rac/crs3" }
+  - { name: "/dev/rac/data" }
+  - { name: "/dev/rac/fra" }
 
 
-_grid:
-  ClusterConfigu_Type: STANDALONE
-  clusterName: racdb01
-  vscanName: "{{ clusterName }}-scan"
-  vscanPort: 1521
-  # node1_fq_hostname: rk8-oracle01.jtest.pivotal.io
-  # node1_fq_vipname:  rk8-oracle01-vip.jtest.pivotal.io
-  # node2_fq_hostname: rk8-oracle02.jtest.pivotal.io
-  # node2_fq_vipname:  rk8-oracle02-vip.jtest.pivotal.io
-  # node3_fq_hostname: rk8-oracle03.jtest.pivotal.io
-  # node3_fq_vipname:  rk8-oracle03-vip.jtest.pivotal.io
-  networkInterfaceList: "{{ netdev2 }}:{{ network2 }}:1,{{ netdev0 }}:{{ network0 }}:5"
-  SYS_PASSWORD: "changeme"
-  SYSASMPassword: "changeme"
-  storage_Option: FLEX_ASM_STORAGE
-  dg_name: DATA
-  dg_redundancy: EXTERNAL
-  monitor_Password: "changeme"
-  ignore_DownNodes: false
-  mgt_Option: NONE
-  oms_Port: 0
-  execute_RootScript: false
-  domain: "jtest.pivotal.io"
-  dev_group: /dev/rac
-  asmdisks:
-    - { name: "/dev/rac/crs1" }
-    - { name: "/dev/rac/crs2" }
-    - { name: "/dev/rac/crs3" }
-    - { name: "/dev/rac/data" }
-    - { name: "/dev/rac/fra" }
-  asmdiskpre: /dev/oracleasm/disks/ASM_DISK0
-  dg_au: 1
-  asmdiskDiscoveryString: "/dev/oracleasm/disks"
-  disk_discstr: "/dev/oracleasm/disks/*"
-
+#_grid:
+#  oracle_user: "oracle"
+#  software_dir: "/u01/stage"
+#  oracle_install_group: "oinstall"
+#  root_dir: "/u02"
+#  stage_dir: "/u02/stage"
+#  grid_home: /u02/app/21.3.0/grid
+#  grid_base: /u02/app/grid
+#  asmi_name: "+ASM"
+#  ASMI: "+ASM"
+#  gridsetup_installer: "{{ grid_home }}/gridSetup.sh"
+#  gi_rspfile:  gridsetup21c.rsp
+#  grid_user: grid
+#  root_user: root
+#  ora_inventory: /u02/app/oraInventory
+#  ora_language: en
+#  install_option: CRS_SWONLY
+#  oracle_base: /u02/app/oracle
+#  oracle_home: /u02/app/21.3.0/grid
+#  dba_grp: dba
+#  oper_grp: dba
+#  osasm_grp: dba
+#  scan_name: racdb01-scan
+#  scan_port: 1521
+#  inventory_location: "/u02/app/oraInventory"
+#  oracle_base: "/u02/app/grid"
+#  asmdisks:
+#    - { name: "/dev/rac/crs1" }
+#    - { name: "/dev/rac/crs2" }
+#    - { name: "/dev/rac/crs3" }
+#    - { name: "/dev/rac/data" }
+#    - { name: "/dev/rac/fra" }
+#  install:
+#    option: CRS_CONFIG
+#    asm:
+#      osdba: oinstall
+#      osoper:
+#      osasm: asmadmin
+#      configure_gimr_data_dg: false
+#      sys_asm_password: "Changeme12!@"    # Oracle123
+#      diskGroup:
+#        name: DATA
+#        redundancy: EXTERNAL
+#        au_size: 1
+#        # disks_with_failure_group_names: /dev/oracleasm/disks/ASM_DISK01,,/dev/oracleasm/disks/ASM_DISK02,,/dev/oracleasm/disks/ASM_DISK03,,/dev/oracleasm/disks/ASM_DISK04,,/dev/oracleasm/disks/ASM_DISK05,,/dev/oracleasm/disks/ASM_DISK06,
+#        # disks: /dev/oracleasm/disks/ASM_DISK01,/dev/oracleasm/disks/ASM_DISK02,/dev/oracleasm/disks/ASM_DISK03,/dev/oracleasm/disks/ASM_DISK04,/dev/oracleasm/disks/ASM_DISK05,/dev/oracleasm/disks/ASM_DISK06
+#        # disk_discovery_string: /dev/oracleasm/disks/*
+#        # disksWithFailureGroupNames: {{ asmdisk_fg_list }}
+#        disks: {{ asmdisk_list }}
+#        diskDiscoveryString: {{ _grid.dev_group }}/*
+#        monitor_password: "Changeme12!@"   # Oracle123
+#        configure_afdd: false
+#        gimr_dg:
+#          au_size: 1
+#    crs:
+#      config:
+#        scan_type: LOCAL_SCAN
+#        gpnp:
+#          scan_name: racdb01-scan
+#          scanPort: 1521
+#          configure_gns: false
+#        cluster_configuration: STANDALONE
+#        configure_as_extended_cluster: false
+#        cluster_name: racdb01
+#        auto_configure_cluster_node_vip: false
+#        cluster_nodes={{ all_cluster_nodes }}
+#        network_interface_list: {{ netdev2 }}:{{ network2 }}:1,{{ netdev0 }}:{{ network0 }}:5
+#        configureGIMR: false
+#        storageOption: FLEX_ASM_STORAGE
+#        configure_rhps: false
+#        ignore_down_nodes: false
+#        management_option: NONE
+#      rootconfig:
+#          execute_root_script=false
+#

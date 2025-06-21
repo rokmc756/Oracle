@@ -20,14 +20,18 @@
 - name: Define Facts for All Worker's Hostname
   set_fact:
     all_db_hosts: "{{ groups['all'] | map('extract', hostvars, ['ansible_hostname']) | join(',') }}"
-    all_cluster_nodes:  "{{ groups['all'] | map('extract', hostvars, ['ansible_hostname']) | map('regex_replace', '$', '.jtest.pvital.io' ) | map('regex_replace', '$',  ':' ~ ansible_hostname ~ '-vip.jtest.pvital.io' ) | list | join(',') }}"
 - debug: msg={{ all_db_hosts }}
-- debug: msg={{ all_domain_list }}
 
 
-#- name: Set fact for Oracle Group List Except Oinstall Group
-#  set_fact:
-#    oracle_group_list: "{{ _rac.install_group | selectattr('group', 'defined') | map(attribute='group') | reject('search','oinstall') | join(',') }}"
+- name: Define Facts for All Worker's Hostname
+  set_fact:
+    all_cluster_nodes: "{%- for h in groups['all'] %}{{ hostvars[h]['ansible_hostname'] }}.{{ grid_domain }}:{{ hostvars[h]['ansible_hostname'] }}-{{ vip_prefix }}.{{ grid_domain }}{% if not loop.last %},{% endif %}{% endfor %}"
+- debug: msg={{ all_cluster_nodes }}
+
+
+- name: Set fact for Oracle Group List Except Oinstall Group
+  set_fact:
+    oracle_group_list: "{{ _oracle.install_group | selectattr('group', 'defined') | map(attribute='group') | reject('search','oinstall') | join(',') }}"
 
 
 - name: Set Default Network Device and Address
@@ -43,9 +47,8 @@
 
 - name: Set fact for ASM Disk Groups
   set_fact:
-    asmdisk_list: "{{ _grid.asmdisks | map(attribute='name') | join(',') }}"
-    asmdisk_fg_list: "{{ _grid.asmdisks | map(attribute='name') | join(',,') }}"
+    asmdisk_list: "{{ asmdisks | map(attribute='name') | join(',') }}"
+    asmdisk_fg_list: "{{ asmdisks | map(attribute='name') | join(',,') }}"
 - debug: msg={{ asmdisk_list }}
-- debug: msg={{ asmdisk_fg_list }}
-
+# - debug: msg={{ asmdisk_fg_list }}
 

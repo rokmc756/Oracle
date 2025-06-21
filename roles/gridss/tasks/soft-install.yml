@@ -1,0 +1,31 @@
+---
+#============================================================================================================================================================================
+# (1) Install Oracle Grid Infrastructure 21.3.0 Software Only in Silent Mode
+# (2) Validate output logs
+#============================================================================================================================================================================
+
+- name: Setup Oracle 21c Grid Infrastructure Software
+  remote_user: "{{ root_user }}"
+  become_user: "{{ grid_user }}"
+  shell: |
+    {{ grid_home }}/gridSetup.sh -silent -ignorePrereqFailure -waitforcompletion -skipStackCheck \
+    -responseFile {{ stage_dir }}/{{ gi_rspfile }} > /u02/stage/giinstalloutput.log
+  args:
+      warn: false # set warn=false to prevent warning
+  failed_when: racgisoft_install_result.rc != 6   #### This condition is based on my own setup
+  register: racgisoft_install_result
+  no_log:             true
+  when: inventory_hostname in groups['primary']
+
+
+- name: Get the Output Log Status
+  remote_user: "{{ root_user }}"
+  shell: |
+    grep -r "Successfully Setup Software with *" /u02/stage/giinstalloutput.log
+  register: racgisoftinstall_log
+  when: inventory_hostname in groups['primary']
+
+
+- name: "Output from Post Oracle Grid Infrastructure Software Installation Check"
+  debug: msg='{{racgisoftinstall_log.stdout_lines}}'
+

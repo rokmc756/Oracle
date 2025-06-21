@@ -1,0 +1,51 @@
+---
+#=========================================================================================================================================
+# Summary Steps:
+# (1) Create a RAC database using response file in silent mode
+# (2) Add oratab entry 
+#=========================================================================================================================================
+
+- name: Create a RAC Database
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  shell: |
+    '{{ oracle_home }}/bin/dbca -silent -createDatabase -ignorePreReqs -responseFile {{ stage_dir }}/{{ dbrac21c_rsp }}'
+  environment: "{{ env_db }}"
+  ignore_errors: True
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Output Log of Database Creation
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: oracle
+  shell: |
+    cat {{oracle_base}}/cfgtoollogs/dbca/{{db_unqname}}/{{db_unqname}}.log
+  register: dbcreateloginfo
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: "Output from Database Creation"
+  debug:
+    var: dbcreateloginfo.stdout_lines|map('trim')|list
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Add Oratab Entry to First node
+  remote_user: "{{ root_user }}"
+  lineinfile: dest='/etc/oratab' state=present regexp='^{{ oracle_sid }}1:{{ oracle_home }}:N' line='{{ oracle_sid }}1:{{ oracle_home }}:Y'
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Add Oratab Entry to Second Node
+  remote_user: "{{ root_user }}"
+  lineinfile: dest='/etc/oratab' state=present regexp='^{{ oracle_sid }}2:{{ oracle_home }}:N' line='{{ oracle_sid }}2:{{ oracle_home }}:Y'
+  when: inventory_hostname in groups['secondary']
+  # when: inventory_hostname in groups['ora-x2']
+
+

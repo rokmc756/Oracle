@@ -1,30 +1,37 @@
 ---
-# =====================================================================================
-# Install Oracle Database 21.3.0 software for RAC using Ansible:
-# Defining Cariables as of my setup 
-# =====================================================================================
+#=========================================================================================
+# Defining Variables
+#=========================================================================================
 
-oracle_user:                     "oracle"
-oracle_install_group:            "oinstall"
-softstage_dir:                   "/u01/stage"
-stage_dir:                       "/u02/stage"
-scripts_directory:               "{{ stage_dir }}/scripts"
-oracle_base:                     /u02/app/oracle
-oracle_inventory:                "/u02/app/oraInventory"
-oracle_home:                     "{{ oracle_base }}/product/21.3.0/db300"
-grid_user: 			 grid
-root_user: 			 root
-dbsoft21c_rsp: 			 dbsoft21c.rsp
-oracle_home_name:                "RDBMS21"
-Installedition:                  EE
-DBA_GROUP:                       dba
-OPER_GROUP:                      oper
-OSOTHERS_GROUP:                  oinstall
-# NODES:                         ora-x1,ora-x2
-syspass:                        "changeme"
-systempass:                     "changeme"
-NODES:                           rk8-oracle01,rk8-oracle02,rk8-oracle03
+oracle_user:          "oracle"
+oracle_install_group: "oinstall"
+ora_languages:        "en"
+softstage_dir:        "/u01/stage"
+stage_dir:            "/u02/stage"
+scripts_directory:    "{{ stage_dir }}/scripts"
+oracle_base:          "/u02/app/oracle"
+oracle_inventory:     "/u02/app/oraInventory"
+oracle_home:          "{{ oracle_base }}/product/21.3.0/db300"
+grid_user:            "grid"
+root_user:            "root"
+dbsoft21c_rsp:        "dbsoft21c.rsp"
+oracle_home_name:     "RDBMS21"
+install_edition:      "EE"
+dba_group:            "dba"
+oper_group:           "oper"
+osothers_group:       "oinstall"
+syspass:              "Changeme12!@"
+systempass:           "Changeme12!@"
+nodes:                "{{ all_db_hosts }}"
+rac_domain:           "jtest.pivotal.io"
+vip_prefix:           "vip"
 opatchenv:
-  ORACLE_HOME: "{{ oracle_home }}"
-  PATH: "{{ oracle_home}}/OPatch:$PATH:/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin"
+  ORACLE_HOME:        "{{ oracle_home }}"
+  PATH:               "{{ oracle_home }}/OPatch:$PATH:/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin"
+asmdisks:
+  - { name: "/dev/rac/crs1" }
+  - { name: "/dev/rac/crs2" }
+  - { name: "/dev/rac/crs3" }
+  - { name: "/dev/rac/data" }
+  - { name: "/dev/rac/fra" }
 

@@ -1,12 +1,12 @@
 ---
-#======== =============================================================================
-# Assumption: 
+#===============================================================================================
+# Assumption:
 #  -  Oracle database pre install rpm downloaded
 #  -  Oracle Database software is downloaded and staged
 # (1) Check if Binaries are already installed
 # (2) Create required directories
 # (3) Unpack Oracle Database software to the Oracle Home directory into the first node
-# =====================================================================================
+#===============================================================================================
 
 - name: Check if Binaries are Already Installed
   shell: grep "={{ oracle_home_name }}" {{ oracle_inventory }}/ContentsXML/inventory.xml
@@ -34,13 +34,13 @@
   remote_user: "{{ root_user }}"
   copy: src={{ item.fn }} dest={{ item.dest }} owner=grid group=oinstall mode=0775
   with_items:
-    - { dest: "{{ stage_dir }}" ,    fn: "oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm" }
+    - { dest: "{{ stage_dir }}" ,    fn: "{{ oracle_preinstall_pkg }}" }
     - { dest: "{{ softstage_dir }}", fn: "LINUX.X64_213000_db_home.zip" }
 
 
 - name: Install Oracle Database Preinstall RPM from a Local File
   yum:
-    name: /u02/stage/oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm
+    name: "/u02/stage/{{ oracle_preinstall_pkg }}"
     state: present
     disable_gpg_check: yes
 

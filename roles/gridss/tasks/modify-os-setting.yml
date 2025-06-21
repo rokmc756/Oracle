@@ -1,0 +1,26 @@
+---
+#========================================================================================
+# (1) Assumption: Oracle GI software is downloaded and staged
+# (2) modify settings for OS
+#========================================================================================
+
+- name: Change SELinux is Disable
+  lineinfile: dest=/etc/selinux/config create=no insertafter=EOF line='SELINUX=disabled'
+
+
+- name: Stop Firewall
+  shell: systemctl stop firewalld
+
+
+- name: Stop Auto Start a Firewall
+  shell: systemctl disable firewalld
+
+
+- name: Stop Auto Start a Chronyd
+  shell: systemctl disable chronyd
+
+
+- name: Stop Chronyd
+  shell: systemctl stop chronyd
+
+

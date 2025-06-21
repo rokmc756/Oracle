@@ -9,7 +9,10 @@
 
 - name: Check UDEV
   shell: |
-    ls -al /dev/rac
+    ls -al /dev/{{ item }}
   register: check_udev
+  with_items:
+    - rac
+    - oracleasm
 - debug: msg={{ check_udev }}
 

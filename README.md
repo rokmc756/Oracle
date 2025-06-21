@@ -189,5 +189,8 @@ $ make single r=stop s=db
 - [ ] Consider playbook to add RAC referring to this link - https://github.com/oravirt/ansible-oracle, http://www.koreaoug.org/install/9222
 - [ ] Install Oracle Grid Software
 - [ ] Deinstall RAC - https://oracledbwr.com/step-by-step-deleting-node-in-oracle-rac-12c-release-1-environment/
+- [ ] RAC DB 1 : Not in the discovery yet - https://www.cnblogs.com/liufarui/p/10962411.html,
+- [ ] RAC DB 2 : https://dbalifeeasy.com/tag/ora-15014-path-orclocr_vote01-is-not-in-the-discovery-set/
+- [ ] RAC DB 3 : https://baazi.wordpress.com/tag/ora-15018-ora-15031-ora-15014/
 
 

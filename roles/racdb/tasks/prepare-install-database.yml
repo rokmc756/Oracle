@@ -1,0 +1,87 @@
+---
+- name: Create Required Directories
+  remote_user: "{{ root_user }}"
+  file:
+    path="{{ item }}"
+    state=directory
+    owner="{{ oracle_user }}"
+    group="{{ oracle_install_group }}"
+    mode=0775
+  with_items:
+    - "{{ stage_dir }}"
+    - "{{ dbfile_path }}"
+  # when: inventory_hostname in groups['dbservers']
+
+
+- name: Create an Init Parameter File for the Instance
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  file:
+    dest: "{{ oracle_home }}/dbs/init{{ oracle_sid }}1.ora"
+    state: touch
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Create a Silent Database Install File
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  template: src=templates/dbrac21c_rsp.j2 dest={{ stage_dir }}/dbrac21c.rsp owner=oracle group=oinstall mode=0775
+  register: silent_racdbsrpfile
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Template for Setting Up Compatible Parameter
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  template: src=templates/setup_compatible.sh.j2 dest={{ stage_dir }}/setup_compatible.sh owner=oracle group=oinstall mode=0775
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Template to Get the Spfile Path
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  template: src=templates/setup_db_crefile_dest.sh.j2 dest={{ stage_dir }}/setup_db_crefile_dest.sh owner=oracle group=oinstall mode=0775
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Template - Setup Silent Reco Diskgroup Config Script
+  remote_user: "{{ root_user }}"
+  template:
+      src=roles/racdb21c_create/templates/createdg_reco.sh.j2
+      dest={{ stage_dir }}/createdg_reco.sh
+      owner="{{ grid_user }}"
+      group="{{ grid_group }}"
+      mode=0775
+  # tags:
+  #  - reco_slntcfg
+  # when: inventory_hostname in groups['ora-x1']
+  when: inventory_hostname in groups['primary']
+
+
+- name: Copy Database SQL Script to the Target Database Server
+  copy: src=roles/racdb21c_create/files/{{ item }} dest={{ stage_dir }} owner=oracle group=oinstall mode=0775 force=yes
+  with_items:
+    - chk_version.sql
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Create_RACDB | Template Setup Compatible Parameter
+  remote_user: "{{ root_user }}"
+  template:
+    src=roles/racdb21c_create/templates/setup_compatible.sh.j2
+    dest={{ stage_dir }}/setup_compatible.sh
+    owner="{{ oracle_user }}"
+    group="{{ oracle_install_group }}"
+    mode=0775
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+

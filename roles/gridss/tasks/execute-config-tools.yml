@@ -1,0 +1,26 @@
+---
+#===================================================================================================================================================
+# (1) Install Oracle Grid Infrastructure 21.3.0 executeConfigTools in Silent Mode
+# (2) Validate Output Logs
+#===================================================================================================================================================
+
+- name: Install Oracle 21c Grid Infrastructure ConfigTools in Silent Mode
+  remote_user: "{{ root_user }}"
+  become_user: "{{ grid_user }}"
+  shell: |
+    {{ grid_home }}/gridSetup.sh -silent -executeConfigTools -responseFile {{ stage_dir }}/{{ gi_rspfile }} > /u02/stage/giconfigoutput.log
+  register: racgi_configtools_result
+  when: inventory_hostname in groups['primary']
+
+
+- name: Get the logfile name ConfigTools
+  remote_user: "{{ root_user }}"
+  shell: |
+    grep -r "Successfully Configured Software *" /u02/stage/giconfigoutput.log
+  register: configtools_log
+  when: inventory_hostname in groups['primary']
+
+
+- name: Get the logfile information for ConfigTools
+  debug: msg='{{configtools_log.stdout_lines}}'
+

@@ -7,7 +7,7 @@
   remote_user: "{{ root_user }}"
   become_user: oracle
   shell: |
-    opatch lsinventory|grep "Oracle Database" > {{stage_dir}}/output.log
+    opatch lsinventory|grep "Oracle Database" > {{ stage_dir }}/output.log
   environment: "{{ opatchenv }}"
 
 

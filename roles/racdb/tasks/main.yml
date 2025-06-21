@@ -1,0 +1,88 @@
+---
+#=======================================================================================================
+# Create Oracle Database 21.3.0 RAC Database
+#=======================================================================================================
+
+- name: Check OS ( Oracle RAC Database )
+  fail: msg="Not a Red Hat based system!"
+  when: ansible_os_family != 'RedHat' or ansible_os_family != 'CentOS' or ansible_os_family != 'Rocky'
+
+
+- name: Set Facts for Network and Packages Informations
+  import_tasks: set-facts.yml
+  tags: pre, post, prepare, install, uninstall, add, setup, execute, remove, verify, check, upload, copy
+
+
+- name: Display Pre Database Create Message
+  debug:
+    msg:
+      - 'This Playbook is for Creating Oracle RAC database at {{ ansible_date_time.iso8601 }}:'
+  tags: pre, install
+  when: ( msg is defined and msg ==  true ) or ( racdb_all is defined and racdb_all == true )
+
+
+#- name: Precheck before Creating Oracle Database using Ansible
+#  block:
+#    - import_tasks: rac21c_predbsoftchk.yml
+#    - import_tasks: racdb21c_pretemplatecreate.yml
+#    - import_tasks: racdb21c_recodg.yml
+#  become:           yes
+#  become_user:      root
+
+
+- name: Check if Oracle Software Binaries are Already Installed
+  import_tasks: check-database-software.yml
+  tags: check
+  when: ( bin is defined and bin == true ) or ( racdb_all is defined and racdb_all == true )
+
+
+- name: Upload Necessary Templates for Creating a RAC database
+  import_tasks: upload-template.yml
+  tags: upload, copy
+  when: ( template is defined and template == true ) or ( racdb_all is defined and racdb_all == true )
+
+
+- name: Create RECO diskgroup if not exist
+  import_tasks: create-reco-diskgroup.yml
+  tags: create
+  when: ( reco is defined and reco == true ) or ( racdb_all is defined and racdb_all == true )
+
+
+- name: Create a RAC database using response file
+  import_tasks: create-rac-database.yml
+  tags: create
+  when: ( db is defined and db == true ) or ( racdb_all is defined and racdb_all == true )
+
+
+- name: Setup RAC Parameters and Create Users
+  import_tasks: create-rac-parameters.yml
+  tags: create
+  when: ( param is defined and param == true ) or ( racdb_all is defined and racdb_all == true )
+
+
+- name: Restart and Validate RAC Database
+  import_tasks: verify-rac-database.yml
+  tags: verify
+  when: ( db is defined and db == true ) or ( racdb_all is defined and racdb_all == true )
+
+
+- name: Remove stage directory
+  remote_user: "{{ root_user }}"
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ stage_dir }}"
+  tags: delete, remove, uninstall
+  when: ( stage is defined and stage == true ) or ( racdb_all is defined and racdb_all == true )
+
+
+- name: display post database create message
+  debug:
+    msg:
+      - 'This Steps completed below task for RAC database at {{ansible_date_time.iso8601}}:'
+      - 'Oracle 21c Oracle RAC Database task completed successfully in Silent Mode'
+      - 'END OF ALL: this git repository will be shared'
+  tags: post, uninstall
+  when: ( msg is defined and msg ==  true ) or ( racdb_all is defined and racdb_all == true )
+

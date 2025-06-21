@@ -28,6 +28,6 @@
   register: logdata
 
 
-- debug:
-    msg: "{{ logdata.stdout_lines|map('trim')|list }}"
+- debug: msg="{{ logdata.stdout_lines|map('trim')|list }}"
+
 

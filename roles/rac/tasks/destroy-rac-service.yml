@@ -8,10 +8,11 @@
 - debug: msg="{{ gen_deinstall_rsp_file.stdout_lines }}"
   when: inventory_hostname in groups['primary']
 
-- set_fact:
+
+- name: Set RSP File Fact
+  set_fact:
     deinstall_rsp_file="{{ ( gen_deinstall_rsp_file.stdout_lines | select('search', 'Location of response file generated') | list | string | split(' '))[-1] | replace('\"]', '') }}"
   when: inventory_hostname in groups['primary']
-
 - debug: msg={{ deinstall_rsp_file }}
   when: inventory_hostname in groups['primary']
 

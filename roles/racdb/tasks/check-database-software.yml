@@ -1,0 +1,41 @@
+---
+#============================================================================================================
+# Summary Steps:
+# (1) Check if Binaries are already installed
+#============================================================================================================
+
+- name: Check Binaries are Already Installed-N1
+  shell: cat {{ oracle_inventory }}/ContentsXML/inventory.xml | grep {{oracle_home_name}} | cut -d\" -f4
+  register: dbsoft_checkn1
+  failed_when: false
+  when: inventory_hostname in groups['primary']
+
+
+- name: Print Results
+  debug:
+    var: dbsoft_checkn1.stdout
+  when: inventory_hostname in groups['primary']
+
+
+- name: Check if RDBMS Software is Installed
+  fail: msg=" ----- Oracle RDBMS is not installed~N1 ----- "
+  when: inventory_hostname in groups['primary'] and dbsoft_checkn1.stdout != oracle_home
+
+
+- name: Check Binaries are Already Installed-N2
+  shell: cat {{ oracle_inventory }}/ContentsXML/inventory.xml | grep {{oracle_home_name}} | cut -d\" -f4
+  register: dbsoft_checkn2
+  failed_when: false
+  when: inventory_hostname in groups['secondary']
+
+
+- name: Print Results
+  debug:
+    var: dbsoft_checkn2.stdout
+  when: inventory_hostname in groups['secondary']
+
+
+- name: Check if RDBMS Software is Installed
+  fail: msg=" ----- Oracle Database Software is not installed~N2 ----- "
+  when: inventory_hostname in groups['secondary'] and dbsoft_checkn2.stdout != oracle_home
+

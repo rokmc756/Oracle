@@ -21,7 +21,7 @@
     - "/etc/oracle.ahf.loc"
     - "var/tmp/.oracle"
     - "/tmp/.oracle"
-- debug: msg={{ remove_leftover_crs_file_config }}
+    - "/opt/ORCLfma"
 
 
 - name: Remove leftover CRS Systemd Config File
@@ -32,5 +32,4 @@
     - crs
     - cssd
     - ohasd
-- debug: msg={{ remove_leftover_crs_systemd_config_file }}
 

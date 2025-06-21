@@ -1,0 +1,112 @@
+---
+#=======================================================================================
+# Summary Steps:
+# (1) Setup database compatible parameter
+# (2) Setup database password file
+# (3) Setup User SYS, SYSTEM and DBSNMP Password Parameter
+# (4) Restart cluster database
+#=======================================================================================
+
+- name: Setup Compatible Parameter
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  shell: |
+    {{ stage_dir }}/setup_compatible.sh
+  register: v_version
+  args:
+     executable: /bin/bash
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Print Versions Compatible Parameter
+  debug:
+    var: v_version.stdout_lines|map('trim')|list
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Register Variable for Spfilepath
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  shell: |
+    {{ stage_dir }}/check_spfile_path.sh
+  register: v_spfilepath
+  args:
+     executable: /bin/bash
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Set Up Initfile Entry
+  remote_user: "{{ root_user }}"
+  # become: true
+  become_user: "{{ oracle_user }}"
+  lineinfile:
+    dest: "{{ oracle_home }}/dbs/init{{ oracle_sid }}1.ora"
+    line: "{{ spfile }}='{{ item }}'"
+  with_items:
+    - "{{ v_spfilepath.stdout }}/{{ db_unqname }}/spfile{{ oracle_sid }}.ora"
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Setup Password File to ASM Disk Group
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  shell: |
+    {{ stage_dir }}/orapwd.sh
+  register: orapwdfile
+  environment: "{{ env_db }}"
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Setup Compatible Parameter
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  shell: |
+    echo "{{ item }};" | {{ oracle_home }}/bin/sqlplus / as sysdba
+  register: sqlplus_compatible_result
+  with_items:
+    - alter system set compatible={{ v_version.stdout }} scope=spfile
+  environment: "{{ env_db }}"
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Setup User SYS, SYSTEM and DBSNMP Password Parameter
+  remote_user: "{{ root_user }}"
+  # become: true
+  become_user: "{{ oracle_user }}"
+  shell: |
+    echo "{{ item }};" | {{ oracle_home }}/bin/sqlplus / as sysdba
+  environment: "{{ env_db }}"
+  with_items:
+    - alter user DBSNMP identified by {{ dbsnmppwd }}
+    - alter user SYSTEM identified by {{ systempwd }}
+    - alter user SYS identified by {{ syspwd }}	
+  register: sqlplus_userpass_result
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Create Database and Pfile
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  shell: |
+    export ORACLE_HOME={{ oracle_home }}
+    export ORACLE_SID={{ db_unqname }}1
+    export PATH=$PATH:$ORACLE_HOME/bin
+    echo "{{ item }};" | {{ oracle_home }}/bin/sqlplus / as sysdba
+  register: sqlplus_dpfile
+  with_items:
+    - create pfile from spfile
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+

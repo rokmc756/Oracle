@@ -1,0 +1,60 @@
+---
+#=================================================================================================================================
+# Assumption:
+#  -  RAC NODE ( example - primary ) is Configured
+#  -  All Required OS Groups and Users are in Place
+#  -  Necessay Network Setup is in Place
+#  -  Oracle 21c Grid Infrastructure Software is Downloaded and Staged
+#
+# Summary Steps:
+# (1) Install CVU
+# (2) Unzipped Oracle 21c Grid Infrastructure Software
+# (3) Create Response File for Silent Installation
+# (4) Install Oracle Grid Infrastructure 21.3.0 Software Only in Silent Mode
+# (5) Run Necessay Root Scripts
+#=================================================================================================================================
+
+- name: Display Pre Installation of Oracle 21c Grid Infrastructure Software Message
+  debug:
+    msg:
+      - 'This playbook is for installing Oracle RAC GI Standalone software 21c , started at {{ansible_date_time.iso8601}}:'
+
+
+- name: Preparation Tasks for Installing Oracle Grid Infrastructure Software
+  block:
+    - import_tasks:     modify-os-setting.yml
+    - import_tasks:     modify-oracle-setting.yml
+    - import_tasks:     oracle-userngroup.yml
+    - import_tasks:     create-required-dirs.yml
+    - import_tasks:     install-ntp.yml
+    - import_tasks:     pre-install.yml
+
+
+- name: Install Oracle 21c Grid Infrastructure Software
+  block:
+    - import_tasks: soft-install.yml
+    - import_tasks: execute-root.yml
+
+
+- name: Post Oracle GI Installation Tasks
+  block:
+    - import_tasks: execute-config-tools.yml
+    - import_tasks: post-install.yml
+
+
+- name: Remove Stage Directory
+  remote_user: "{{ root_user }}"
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ stage_dir }}"
+
+
+- name: Display Post Installation Message
+  debug:
+    msg:
+      - 'This completed installing Oracle RAC GI Standalone software 21c , at {{ansible_date_time.iso8601}}:'
+      - '- Install Oracle Grid Infrastructure 21c on node ora-x1'
+      - '- END OF ALL: git repository for this task will be shared'
+

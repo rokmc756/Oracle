@@ -1,0 +1,47 @@
+---
+#===========================================================
+# Summary Steps:
+# (1) Restart database and validate using crsctl
+#===========================================================
+
+- name: Stop Cluster Database
+  remote_user: "{{ root_user }}"
+  # become: true
+  become_user: "{{ oracle_user }}"
+  shell: |
+    srvctl stop database -d {{ db_unqname }}
+  environment: "{{ env_db }}"
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Start Cluster Database
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  shell: |
+    srvctl start database -d {{ db_unqname }}
+  environment: "{{ env_db }}"
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Check Cluster Database Status
+  remote_user: "{{ root_user }}"
+  # become: yes
+  become_user: "{{ oracle_user }}"
+  shell: |
+    srvctl status database -d {{ db_unqname }}
+  environment: "{{ env_db }}"
+  register: database_status
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+
+- name: Print Database Status
+  debug:
+    var: database_status.stdout_lines|map('trim')|list
+  when: inventory_hostname in groups['primary']
+  # when: inventory_hostname in groups['ora-x1']
+
+

@@ -27,7 +27,7 @@
   shell: |
     {{ oracle_home }}/runInstaller -ignorePrereq -waitforcompletion -silent \
     -responseFile {{ stage_dir }}/{{ dbsoft21c_rsp }} > /u02/stage/dbinstalloutput.log
-  failed_when: racdbsoft_install_result.rc != 6   #### This condition is based on my own setup
+  failed_when: racdbsoft_install_result.rc != 6                                         ## This condition is based on my setup
   register: racdbsoft_install_result
   when: inventory_hostname in groups['primary']
   # args:

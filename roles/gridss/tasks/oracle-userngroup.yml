@@ -1,0 +1,173 @@
+---
+#=============================================================================
+# (1) Assumption: Oracle GI software is downloaded and staged
+# (2) Create or modify required users 
+#=============================================================================
+
+- name: Check Group for Oinstall
+  shell: grep oinstall /etc/group
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add Group for Oinstall
+  shell: /usr/sbin/groupadd -g 54321 oinstall
+  changed_when: False
+  when: result|failed
+
+
+- name: Check Group for DBA
+  shell: grep dba /etc/group
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add Group for DBA
+  shell: /usr/sbin/groupadd -g 54322 dba
+  changed_when: False
+  when: result|failed
+
+
+- name: Check Group for Oper
+  shell: grep oper /etc/group
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add Group for Oper
+  shell: /usr/sbin/groupadd -g 54323 oper
+  changed_when: False
+  when: result|failed
+
+
+- name: Check Group for Backup DBA
+  shell: grep backupdba /etc/group
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add Group for Backup DBA
+  shell: /usr/sbin/groupadd -g 54324 backupdba
+  changed_when: False
+  when: result|failed
+
+
+- name: Check Group for DG DBA
+  shell: grep dgdba /etc/group
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add Group for DG DBA
+  shell: /usr/sbin/groupadd -g 54325 dgdba
+  changed_when: False
+  when: result|failed
+
+
+- name: Check Group for KM DBA
+  shell: grep kmdba /etc/group
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add Group for KM DBA
+  shell: /usr/sbin/groupadd -g 54326 kmdba
+  changed_when: False
+  when: result|failed
+
+
+- name: Check Group for ASM Admin
+  shell: grep asmadmin /etc/group
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add Group for ASM Admin
+  shell: /usr/sbin/groupadd -g 54329 asmadmin
+  changed_when: False
+  when: result|failed
+
+
+- name: Check Group for ASM DBA
+  shell: grep asmdba /etc/group
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add Group for ASM DBA
+  shell: /usr/sbin/groupadd -g 54327 asmdba
+  changed_when: False
+  when: result|failed
+
+
+- name: Check Group for ASM Oper
+  shell: grep asmoper /etc/group
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add Group for ASM Oper
+  shell: /usr/sbin/groupadd -g 54328 asmoper
+  changed_when: False
+  when: result|failed
+
+
+- name: Check Group for RAC DBA
+  shell: grep racdba /etc/group
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add Group for RAC DBA
+  shell: /usr/sbin/groupadd -g 54330 racdba
+  changed_when: False
+  when: result|failed
+
+
+- name: Check User for Grid
+  shell: id grid
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add User for Grid
+  shell: /usr/sbin/useradd -u 54331 -g oinstall -G dba,asmadmin,asmdba,asmoper,racdba grid
+  changed_when: False
+  when: result|failed
+
+
+- name: Check User for Oracle
+  shell: id oracle
+  register: result
+  ignore_errors: True
+  changed_when: False
+
+
+- name: Add User for Oracle
+  shell: /usr/sbin/useradd -u 54321 -g oinstall -G dba,backupdba,dgdba,kmdba,asmdba,oper,racdba,asmdba oracle
+  changed_when: False
+  when: result|failed
+
+
+- name: Change Password for Grid
+  user:
+    name: "grid"
+    password: "{{ 'oracle' | password_hash('sha512') }}"
+
+
+- name: Change Password for Oracle
+  user:
+    name: "oracle"
+    password: "{{ 'oracle' | password_hash('sha512') }}"
+
